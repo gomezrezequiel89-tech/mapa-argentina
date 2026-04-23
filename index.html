@@ -3,146 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Argentina - Hunter Douglas</title>
+    <title>Mapa de Clientes - Hunter Douglas Argentina</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; }
-        header { background: linear-gradient(135deg,#1a1a2e,#0f3460); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        header h1 { font-size: 1.4em; font-weight: 600; }
-        .main-container { display: flex; height: calc(100vh - 60px); }
-        .sidebar { width: 320px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 15px; }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            height: 56px;
+        }
+        header h1 { font-size: 1.2em; font-weight: 600; }
+
+        .main-container { display: flex; height: calc(100vh - 56px); }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            padding: 12px;
+            flex-shrink: 0;
+        }
+
         .map-container { flex: 1; position: relative; }
         #map { width: 100%; height: 100%; }
-        .search-box { margin-bottom: 15px; }
-        .search-box input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        .stats-panel { background: linear-gradient(135deg,#667eea,#764ba2); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        .stats-panel h3 { font-size: 0.85em; opacity: 0.9; margin-bottom: 8px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-item { background: rgba(255,255,255,0.2); padding: 8px; border-radius: 8px; text-align: center; }
-        .stat-item .number { font-size: 1.6em; font-weight: bold; }
-        .stat-item .label { font-size: 0.7em; opacity: 0.9; }
-        .filter-section { margin-bottom: 15px; }
-        .filter-section h4 { font-size: 0.85em; color: #555; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
-        .filter-btn { display: inline-block; padding: 5px 10px; margin: 3px; border: 2px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; background: white; }
-        .filter-btn.active, .filter-btn:hover { background: #667eea; color: white; border-color: #667eea; }
-        .client-list { max-height: 300px; overflow-y: auto; }
-        .client-card { background: #f8f9ff; border: 1px solid #e8ecff; border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
-        .client-card:hover { background: #e8ecff; transform: translateX(3px); }
-        .client-card h5 { font-size: 0.85em; color: #333; margin-bottom: 3px; }
-        .client-card p { font-size: 0.75em; color: #666; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: 600; margin-top: 3px; }
-        .badge-activo { background: #d4edda; color: #155724; }
-        .badge-prospect { background: #fff3cd; color: #856404; }
-        .badge-inactivo { background: #f8d7da; color: #721c24; }
-        .popup-content { min-width: 200px; }
-        .popup-content h3 { color: #333; margin-bottom: 8px; font-size: 1em; }
-        .popup-content p { font-size: 0.85em; color: #555; margin: 3px 0; }
-        .btn-popup { display: block; width: 100%; padding: 6px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8em; margin-top: 8px; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; }
+
+        .search-box { margin-bottom: 12px; }
+        .search-box input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .stats-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .stats-panel h3 { font-size: 0.75em; opacity: 0.9; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .stat-item { background: rgba(255,255,255,0.2); padding: 6px; border-radius: 6px; text-align: center; }
+        .stat-item .number { font-size: 1.4em; font-weight: bold; }
+        .stat-item .label { font-size: 0.65em; opacity: 0.9; }
+
+        .filter-section { margin-bottom: 12px; }
+        .filter-title {
+            font-size: 0.75em;
+            color: #444;
+            margin-bottom: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        .filter-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tag {
+            padding: 4px 9px;
+            border: 1.5px solid #ddd;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.15s;
+            background: white;
+            user-select: none;
+        }
+        .tag:hover { opacity: 0.85; }
+        .tag.active-dist   { background: #28a745; color: white; border-color: #28a745; }
+        .tag.active-obras  { background: #fd7e14; color: white; border-color: #fd7e14; }
+        .tag.active-dev    { background: #17a2b8; color: white; border-color: #17a2b8; }
+        .tag.active-prosp  { background: #ffc107; color: #333; border-color: #ffc107; }
+        .tag.active-zona   { background: #6f42c1; color: white; border-color: #6f42c1; }
+        .tag.active-todos  { background: #495057; color: white; border-color: #495057; }
+
+        .zona-section { background: #f8f0ff; border: 1px solid #e0c8ff; border-radius: 8px; padding: 8px; margin-bottom: 12px; }
+        .zona-note { font-size: 0.7em; color: #888; margin-bottom: 5px; font-style: italic; }
+
+        .client-list { max-height: 220px; overflow-y: auto; margin-top: 4px; }
+        .client-card {
+            background: #f8f9ff;
+            border: 1px solid #e8ecff;
+            border-radius: 7px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .client-card:hover { background: #e8ecff; transform: translateX(2px); }
+        .client-card h5 { font-size: 0.8em; color: #333; margin-bottom: 2px; }
+        .client-card p { font-size: 0.7em; color: #666; }
+
+        .badge {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 0.65em;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .badge-dist   { background: #d4edda; color: #155724; }
+        .badge-obras  { background: #ffe5cc; color: #7a3800; }
+        .badge-dev    { background: #cceef5; color: #0c5460; }
+        .badge-prosp  { background: #fff3cd; color: #856404; }
+
+        .popup-content { min-width: 190px; font-size: 13px; }
+        .popup-content h3 { color: #333; margin-bottom: 6px; font-size: 0.95em; }
+        .popup-content p { color: #555; margin: 2px 0; font-size: 0.82em; }
+        .btn-popup {
+            display: block; width: 100%; padding: 5px;
+            background: #667eea; color: white; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 0.78em; margin-top: 6px;
+        }
+        .btn-popup.red { background: #dc3545; }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 10000;
+            align-items: center; justify-content: center;
+        }
         .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 15px; padding: 25px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-        .modal h2 { color: #333; margin-bottom: 20px; font-size: 1.2em; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85em; color: #555; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9em; }
+        .modal {
+            background: white; border-radius: 14px; padding: 22px;
+            width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto;
+        }
+        .modal h2 { color: #333; margin-bottom: 16px; font-size: 1.1em; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8em; color: #555; margin-bottom: 4px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 7px 10px;
+            border: 1px solid #ddd; border-radius: 7px; font-size: 0.88em;
+        }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; width: 100%; margin-top: 10px; }
-        .btn-secondary { background: #f0f2f5; color: #333; border: 1px solid #ddd; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; width: 100%; margin-top: 5px; }
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 9px 18px;
+            border-radius: 7px; cursor: pointer; font-size: 0.88em;
+            width: 100%; margin-top: 8px;
+        }
+        .btn-secondary {
+            background: #f0f2f5; color: #333; border: 1px solid #ddd;
+            padding: 9px 18px; border-radius: 7px; cursor: pointer;
+            font-size: 0.88em; width: 100%; margin-top: 5px;
+        }
+
+        .fab {
+            position: fixed; bottom: 25px; right: 25px;
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 50%;
+            font-size: 22px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+            z-index: 1000; transition: transform 0.2s;
+        }
         .fab:hover { transform: scale(1.1); }
-        .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: none; }
-        .legend { position: absolute; bottom: 30px; left: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 12px; }
-        .legend-item { display: flex; align-items: center; margin: 4px 0; }
-        .legend-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+
+        .loading {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white; padding: 18px 28px;
+            border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 9999; display: none;
+        }
+
+        .legend {
+            position: absolute; bottom: 25px; left: 10px;
+            background: white; padding: 10px 12px;
+            border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000; font-size: 11px;
+        }
+        .legend strong { display: block; margin-bottom: 5px; font-size: 11px; color: #333; }
+        .legend-item { display: flex; align-items: center; margin: 3px 0; }
+        .legend-dot { width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; flex-shrink: 0; }
+
+        #connection-status { font-size: 0.75em; opacity: 0.85; }
+        
+        .section-title {
+            font-size: 0.75em; color: #444; margin-bottom: 6px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
+
 <header>
     <h1>Mapa de Clientes - Hunter Douglas Argentina</h1>
-    <div style="font-size:0.8em;opacity:0.8" id="connection-status">Conectando...</div>
+    <div id="connection-status">Conectando...</div>
 </header>
+
 <div class="main-container">
     <div class="sidebar">
-        <div class="search-box"><input type="text" id="search-input" placeholder="Buscar cliente..." oninput="filterClients()"></div>
+
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()">
+        </div>
+
         <div class="stats-panel">
-            <h3>RESUMEN GENERAL</h3>
+            <h3>RESUMEN</h3>
             <div class="stats-grid">
-                <div class="stat-item"><div class="number" id="total-count">0</div><div class="label">Total</div></div>
-                <div class="stat-item"><div class="number" id="activo-count">0</div><div class="label">Activos</div></div>
-                <div class="stat-item"><div class="number" id="prospect-count">0</div><div class="label">Prospects</div></div>
-                <div class="stat-item"><div class="number" id="inactivo-count">0</div><div class="label">Inactivos</div></div>
+                <div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
+                <div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
+                <div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras</div></div>
+                <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
             </div>
         </div>
+
+        <!-- FILTRO TIPOS -->
         <div class="filter-section">
-            <h4>Filtrar por Estado</h4>
-            <span class="filter-btn active" onclick="setFilter('todos',this)">Todos</span>
-            <span class="filter-btn" onclick="setFilter('Activo',this)">Activos</span>
-            <span class="filter-btn" onclick="setFilter('Prospect',this)">Prospects</span>
-            <span class="filter-btn" onclick="setFilter('Inactivo',this)">Inactivos</span>
+            <div class="filter-title">Tipo de Cliente</div>
+            <div class="filter-tags" id="tags-tipo">
+                <span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
+                <span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
+                <span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
+                <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladoras</span>
+                <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
+            </div>
         </div>
-        <div class="filter-section">
-            <h4>Filtrar por Tipo</h4>
-            <span class="filter-btn active" onclick="setTipoFilter('todos',this)">Todos</span>
-            <span class="filter-btn" onclick="setTipoFilter('Distribuidor',this)">Distribuidores</span>
-            <span class="filter-btn" onclick="setTipoFilter('Arquitecto',this)">Arquitectos</span>
-            <span class="filter-btn" onclick="setTipoFilter('Decorador',this)">Decoradores</span>
-            <span class="filter-btn" onclick="setTipoFilter('Empresa',this)">Empresas</span>
+
+        <!-- FILTRO ZONA (solo Buenos Aires) -->
+        <div class="filter-section zona-section">
+            <div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
+            <div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
+            <div class="filter-tags" id="tags-zona">
+                <span class="tag" data-zona="ninguna" onclick="toggleZona('ninguna',this)">Sin filtro</span>
+                <span class="tag" data-zona="Norte" onclick="toggleZona('Norte',this)">Norte</span>
+                <span class="tag" data-zona="Sur" onclick="toggleZona('Sur',this)">Sur</span>
+                <span class="tag" data-zona="Este" onclick="toggleZona('Este',this)">Este</span>
+                <span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
+                <span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
+            </div>
         </div>
-        <h4 style="font-size:0.85em;color:#555;margin-bottom:8px;font-weight:600;text-transform:uppercase">Lista de Clientes</h4>
+
+        <!-- LISTA -->
+        <div class="section-title">Lista de Clientes</div>
         <div class="client-list" id="client-list"></div>
+
     </div>
+
     <div class="map-container">
         <div id="map"></div>
         <div class="legend">
-            <strong style="display:block;margin-bottom:5px">Estado</strong>
-            <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Activo</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospect</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Inactivo</div>
+            <strong>Tipo de Cliente</strong>
+            <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
         </div>
     </div>
 </div>
+
 <button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
 <div class="loading" id="loading">Cargando...</div>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
         <h2 id="modal-title">Agregar Cliente</h2>
         <input type="hidden" id="edit-id">
-        <div class="form-group"><label>Nombre / Empresa *</label><input type="text" id="input-nombre" placeholder="Nombre del cliente"></div>
-        <div class="form-row">
-            <div class="form-group"><label>Estado *</label><select id="input-estado"><option value="Activo">Activo</option><option value="Prospect">Prospect</option><option value="Inactivo">Inactivo</option></select></div>
-            <div class="form-group"><label>Tipo *</label><select id="input-tipo"><option value="Distribuidor">Distribuidor</option><option value="Arquitecto">Arquitecto</option><option value="Decorador">Decorador</option><option value="Empresa">Empresa</option><option value="Otro">Otro</option></select></div>
+
+        <div class="form-group">
+            <label>Nombre / Empresa *</label>
+            <input type="text" id="input-nombre" placeholder="Nombre del cliente o empresa">
         </div>
-        <div class="form-group"><label>Direccion *</label><input type="text" id="input-direccion" placeholder="Calle, numero, ciudad"></div>
+
         <div class="form-row">
-            <div class="form-group"><label>Latitud *</label><input type="number" id="input-lat" placeholder="-34.6037" step="any"></div>
-            <div class="form-group"><label>Longitud *</label><input type="number" id="input-lng" placeholder="-58.3816" step="any"></div>
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select id="input-tipo">
+                    <option value="Distribuidor">Distribuidor</option>
+                    <option value="Obra">Obra ganada</option>
+                    <option value="Desarrolladora">Desarrolladora</option>
+                    <option value="Prospecto">Prospecto</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Zona (si es Bs As)</label>
+                <select id="input-zona">
+                    <option value="">Sin zona</option>
+                    <option value="Norte">Norte</option>
+                    <option value="Sur">Sur</option>
+                    <option value="Este">Este</option>
+                    <option value="Oeste">Oeste</option>
+                    <option value="La Plata">La Plata</option>
+                </select>
+            </div>
         </div>
-        <div class="form-group"><label>Telefono</label><input type="text" id="input-telefono" placeholder="+54 11 0000-0000"></div>
-        <div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="contacto@empresa.com"></div>
-        <div class="form-group"><label>Notas</label><textarea id="input-notas" rows="3" placeholder="Observaciones..."></textarea></div>
+
+        <div class="form-group">
+            <label>Direccion</label>
+            <input type="text" id="input-direccion" placeholder="Calle, numero, ciudad">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Latitud *</label>
+                <input type="number" id="input-lat" placeholder="-34.6037" step="any">
+            </div>
+            <div class="form-group">
+                <label>Longitud *</label>
+                <input type="number" id="input-lng" placeholder="-58.3816" step="any">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Telefono</label>
+            <input type="text" id="input-telefono" placeholder="+54 11 0000-0000">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="input-email" placeholder="contacto@empresa.com">
+        </div>
+
+        <div class="form-group">
+            <label>Notas</label>
+            <textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea>
+        </div>
+
+        <div style="font-size:0.75em;color:#888;margin-bottom:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
+
         <button class="btn-primary" onclick="saveCliente()">Guardar</button>
         <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
     </div>
 </div>
+
 <script src="config.js"></script>
 <script>
 const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let map, markers = {}, allClientes = [], currentFilter = 'todos', currentTipoFilter = 'todos';
-const colors = { 'Activo': '#28a745', 'Prospect': '#ffc107', 'Inactivo': '#dc3545' };
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function createIcon(estado) {
-    const color = colors[estado] || '#6c757d';
-    return L.divIcon({ html: '<div style="width:18px;height:18px;background:' + color + ';border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>', className: '', iconSize: [18,18], iconAnchor: [9,9] });
+let map, markers = {}, allClientes = [];
+let tiposActivos = new Set(['todos']);
+let zonasActivas = new Set(['ninguna']);
+
+// Colores por tipo
+const COLORES = {
+    'Distribuidor':  '#28a745',
+    'Obra':          '#fd7e14',
+    'Desarrolladora':'#17a2b8',
+    'Prospecto':     '#ffc107'
+};
+
+function colorDot(tipo) {
+    const c = COLORES[tipo] || '#6c757d';
+    return L.divIcon({
+        html: '<div style="width:14px;height:14px;background:' + c + ';border:2.5px solid white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.35)"></div>',
+        className: '', iconSize: [14,14], iconAnchor: [7,7]
+    });
 }
 
 function initMap() {
-    map = L.map('map', { center: [-38.4161,-63.6167], zoom: 5 });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '(c) OpenStreetMap', maxZoom: 18 }).addTo(map);
-    map.on('click', function(e) {
+    map = L.map('map', { center: [-38.4161, -63.6167], zoom: 5 });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '(c) OpenStreetMap', maxZoom: 18
+    }).addTo(map);
+    map.on('click', e => {
         document.getElementById('input-lat').value = e.latlng.lat.toFixed(6);
         document.getElementById('input-lng').value = e.latlng.lng.toFixed(6);
     });
@@ -151,86 +382,173 @@ function initMap() {
 async function loadClientes() {
     showLoading(true);
     try {
-        const { data, error } = await supabaseClient.from('clientes').select('*').order('nombre');
+        const { data, error } = await db.from('clientes').select('*').order('nombre');
         if (error) throw error;
         allClientes = data || [];
-        updateStats(); renderMap(); renderList();
-        document.getElementById('connection-status').textContent = 'Conectado';
-    } catch(err) {
-        document.getElementById('connection-status').textContent = 'Error: ' + err.message;
+        updateStats();
+        applyFilters();
+        document.getElementById('connection-status').textContent = 'Conectado (' + allClientes.length + ')';
+    } catch(e) {
+        document.getElementById('connection-status').textContent = 'Error: ' + e.message;
+        console.error(e);
     }
     showLoading(false);
 }
 
 function updateStats() {
-    document.getElementById('total-count').textContent = allClientes.length;
-    document.getElementById('activo-count').textContent = allClientes.filter(c=>c.estado==='Activo').length;
-    document.getElementById('prospect-count').textContent = allClientes.filter(c=>c.estado==='Prospect').length;
-    document.getElementById('inactivo-count').textContent = allClientes.filter(c=>c.estado==='Inactivo').length;
+    document.getElementById('cnt-total').textContent = allClientes.length;
+    document.getElementById('cnt-dist').textContent  = allClientes.filter(c=>c.tipo==='Distribuidor').length;
+    document.getElementById('cnt-obras').textContent = allClientes.filter(c=>c.tipo==='Obra').length;
+    document.getElementById('cnt-dev').textContent   = allClientes.filter(c=>c.tipo==='Desarrolladora').length;
 }
 
-function getFilteredClientes() {
+function getFiltered() {
     const q = document.getElementById('search-input').value.toLowerCase();
     return allClientes.filter(c => {
-        const mE = currentFilter === 'todos' || c.estado === currentFilter;
-        const mT = currentTipoFilter === 'todos' || c.tipo === currentTipoFilter;
-        const mS = !q || c.nombre.toLowerCase().includes(q) || (c.direccion && c.direccion.toLowerCase().includes(q));
-        return mE && mT && mS;
+        const matchTipo = tiposActivos.has('todos') || tiposActivos.has(c.tipo);
+        let matchZona = true;
+        if (!zonasActivas.has('ninguna') && zonasActivas.size > 0) {
+            matchZona = c.zona && zonasActivas.has(c.zona);
+        }
+        const matchSearch = !q || (c.nombre||'').toLowerCase().includes(q) || (c.direccion||'').toLowerCase().includes(q);
+        return matchTipo && matchZona && matchSearch;
     });
 }
 
-function renderMap() {
+function applyFilters() {
+    // Clear markers
     Object.values(markers).forEach(m => map.removeLayer(m));
     markers = {};
-    getFilteredClientes().forEach(c => {
-        if (c.lat && c.lng) {
-            const m = L.marker([c.lat,c.lng], {icon: createIcon(c.estado)});
-            m.bindPopup('<div class="popup-content"><h3>' + c.nombre + '</h3><p>' + (c.direccion||'') + '</p><p>Estado: <strong>' + c.estado + '</strong></p><p>Tipo: ' + (c.tipo||'-') + '</p>' + (c.telefono?'<p>Tel: '+c.telefono+'</p>':'') + (c.email?'<p>Email: '+c.email+'</p>':'') + (c.notas?'<p>'+c.notas+'</p>':'') + '<button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup" style="background:#dc3545" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
-            m.addTo(map);
-            markers[c.id] = m;
-        }
+
+    const filtered = getFiltered();
+
+    filtered.forEach(c => {
+        if (!c.lat || !c.lng) return;
+        const m = L.marker([c.lat, c.lng], { icon: colorDot(c.tipo) });
+        const zona = c.zona ? ' | Zona: ' + c.zona : '';
+        m.bindPopup(
+            '<div class="popup-content">' +
+            '<h3>' + (c.nombre||'') + '</h3>' +
+            '<p>Tipo: <strong>' + (c.tipo||'-') + '</strong>' + zona + '</p>' +
+            '<p>' + (c.direccion||'Sin direccion') + '</p>' +
+            (c.telefono ? '<p>Tel: ' + c.telefono + '</p>' : '') +
+            (c.email    ? '<p>Email: ' + c.email + '</p>' : '') +
+            (c.notas    ? '<p>' + c.notas + '</p>' : '') +
+            '<button class="btn-popup" onclick="editCliente(' + c.id + ')">Editar</button>' +
+            '<button class="btn-popup red" onclick="deleteCliente(' + c.id + ')">Eliminar</button>' +
+            '</div>'
+        );
+        m.addTo(map);
+        markers[c.id] = m;
     });
+
+    renderList(filtered);
 }
 
-function renderList() {
+function renderList(filtered) {
     const list = document.getElementById('client-list');
-    const filtered = getFilteredClientes();
-    list.innerHTML = filtered.length === 0 ? '<p style="text-align:center;color:#999;font-size:0.85em">No hay clientes</p>' : '';
+    if (!filtered || filtered.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#999;font-size:0.8em;padding:10px">Sin resultados</p>';
+        return;
+    }
+    list.innerHTML = '';
     filtered.forEach(c => {
         const div = document.createElement('div');
         div.className = 'client-card';
-        div.innerHTML = '<h5>'+c.nombre+'</h5><p>'+(c.direccion||'Sin direccion')+'</p><span class="badge badge-'+(c.estado||'').toLowerCase()+'">'+c.estado+'</span>';
-        div.onclick = () => { if(markers[c.id]){ map.setView([c.lat,c.lng],13); markers[c.id].openPopup(); } };
+        const badgeClass = {Distribuidor:'dist',Obra:'obras',Desarrolladora:'dev',Prospecto:'prosp'}[c.tipo] || 'dist';
+        const zona = c.zona ? ' | ' + c.zona : '';
+        div.innerHTML =
+            '<h5>' + (c.nombre||'') + '</h5>' +
+            '<p>' + (c.direccion||'Sin direccion') + '</p>' +
+            '<span class="badge badge-' + badgeClass + '">' + (c.tipo||'') + '</span>' +
+            (c.zona ? '<span style="font-size:0.65em;color:#888;margin-left:4px">' + c.zona + '</span>' : '');
+        div.onclick = () => {
+            if (markers[c.id]) {
+                map.setView([c.lat, c.lng], 14);
+                markers[c.id].openPopup();
+            }
+        };
         list.appendChild(div);
     });
 }
 
-function setFilter(f, btn) { currentFilter=f; document.querySelectorAll('.filter-section')[0].querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderMap(); renderList(); }
-function setTipoFilter(f, btn) { currentTipoFilter=f; document.querySelectorAll('.filter-section')[1].querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderMap(); renderList(); }
-function filterClients() { renderMap(); renderList(); }
+// --- FILTROS TIPO (seleccion multiple) ---
+function toggleTipo(tipo, el) {
+    const tags = document.querySelectorAll('#tags-tipo .tag');
+    if (tipo === 'todos') {
+        tiposActivos = new Set(['todos']);
+        tags.forEach(t => t.className = 'tag');
+        el.classList.add('active-todos');
+    } else {
+        // Quitar "todos"
+        tiposActivos.delete('todos');
+        document.querySelector('#tags-tipo [data-tipo="todos"]').className = 'tag';
 
+        if (tiposActivos.has(tipo)) {
+            tiposActivos.delete(tipo);
+            el.className = 'tag';
+        } else {
+            tiposActivos.add(tipo);
+            const cls = {Distribuidor:'active-dist',Obra:'active-obras',Desarrolladora:'active-dev',Prospecto:'active-prosp'}[tipo];
+            el.className = 'tag ' + cls;
+        }
+        if (tiposActivos.size === 0) {
+            tiposActivos.add('todos');
+            document.querySelector('#tags-tipo [data-tipo="todos"]').className = 'tag active-todos';
+        }
+    }
+    applyFilters();
+}
+
+// --- FILTROS ZONA (seleccion multiple) ---
+function toggleZona(zona, el) {
+    if (zona === 'ninguna') {
+        zonasActivas = new Set(['ninguna']);
+        document.querySelectorAll('#tags-zona .tag').forEach(t => t.className = 'tag');
+        el.classList.add('active-zona');
+    } else {
+        zonasActivas.delete('ninguna');
+        document.querySelector('#tags-zona [data-zona="ninguna"]').className = 'tag';
+
+        if (zonasActivas.has(zona)) {
+            zonasActivas.delete(zona);
+            el.className = 'tag';
+        } else {
+            zonasActivas.add(zona);
+            el.className = 'tag active-zona';
+        }
+        if (zonasActivas.size === 0) {
+            zonasActivas.add('ninguna');
+            document.querySelector('#tags-zona [data-zona="ninguna"]').className = 'tag active-zona';
+        }
+    }
+    applyFilters();
+}
+
+// --- MODAL ---
 function openAddModal() {
     document.getElementById('modal-title').textContent = 'Agregar Cliente';
-    ['edit-id','input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('input-estado').value = 'Activo';
+    document.getElementById('edit-id').value = '';
+    ['input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('input-tipo').value = 'Distribuidor';
+    document.getElementById('input-zona').value = '';
     document.getElementById('modal-overlay').classList.add('active');
 }
 
 function editCliente(id) {
-    const c = allClientes.find(x=>x.id===id);
+    const c = allClientes.find(x => x.id === id);
     if (!c) return;
     document.getElementById('modal-title').textContent = 'Editar Cliente';
     document.getElementById('edit-id').value = id;
-    document.getElementById('input-nombre').value = c.nombre||'';
-    document.getElementById('input-estado').value = c.estado||'Activo';
-    document.getElementById('input-tipo').value = c.tipo||'Distribuidor';
-    document.getElementById('input-direccion').value = c.direccion||'';
-    document.getElementById('input-lat').value = c.lat||'';
-    document.getElementById('input-lng').value = c.lng||'';
-    document.getElementById('input-telefono').value = c.telefono||'';
-    document.getElementById('input-email').value = c.email||'';
-    document.getElementById('input-notas').value = c.notas||'';
+    document.getElementById('input-nombre').value    = c.nombre    || '';
+    document.getElementById('input-tipo').value      = c.tipo      || 'Distribuidor';
+    document.getElementById('input-zona').value      = c.zona      || '';
+    document.getElementById('input-direccion').value = c.direccion || '';
+    document.getElementById('input-lat').value       = c.lat       || '';
+    document.getElementById('input-lng').value       = c.lng       || '';
+    document.getElementById('input-telefono').value  = c.telefono  || '';
+    document.getElementById('input-email').value     = c.email     || '';
+    document.getElementById('input-notas').value     = c.notas     || '';
     document.getElementById('modal-overlay').classList.add('active');
 }
 
@@ -238,34 +556,55 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 
 async function saveCliente() {
     const nombre = document.getElementById('input-nombre').value.trim();
-    const lat = parseFloat(document.getElementById('input-lat').value);
-    const lng = parseFloat(document.getElementById('input-lng').value);
-    if (!nombre) { alert('El nombre es obligatorio'); return; }
-    if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias'); return; }
-    const data = { nombre, estado: document.getElementById('input-estado').value, tipo: document.getElementById('input-tipo').value, direccion: document.getElementById('input-direccion').value, lat, lng, telefono: document.getElementById('input-telefono').value, email: document.getElementById('input-email').value, notas: document.getElementById('input-notas').value };
+    const lat    = parseFloat(document.getElementById('input-lat').value);
+    const lng    = parseFloat(document.getElementById('input-lng').value);
+    if (!nombre)        { alert('El nombre es obligatorio'); return; }
+    if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias. Hace clic en el mapa o ingresalas manualmente.'); return; }
+
+    const payload = {
+        nombre,
+        tipo:      document.getElementById('input-tipo').value,
+        zona:      document.getElementById('input-zona').value || null,
+        direccion: document.getElementById('input-direccion').value,
+        lat, lng,
+        telefono:  document.getElementById('input-telefono').value,
+        email:     document.getElementById('input-email').value,
+        notas:     document.getElementById('input-notas').value
+    };
+
     showLoading(true);
     const editId = document.getElementById('edit-id').value;
     try {
-        if (editId) { await supabaseClient.from('clientes').update(data).eq('id',editId); }
-        else { await supabaseClient.from('clientes').insert(data); }
-        closeModal(); await loadClientes();
-    } catch(err) { alert('Error: '+err.message); }
+        if (editId) {
+            const { error } = await db.from('clientes').update(payload).eq('id', editId);
+            if (error) throw error;
+        } else {
+            const { error } = await db.from('clientes').insert(payload);
+            if (error) throw error;
+        }
+        closeModal();
+        await loadClientes();
+    } catch(e) { alert('Error al guardar: ' + e.message); }
     showLoading(false);
 }
 
 async function deleteCliente(id) {
     if (!confirm('Eliminar este cliente?')) return;
     showLoading(true);
-    try { await supabaseClient.from('clientes').delete().eq('id',id); await loadClientes(); }
-    catch(err) { alert('Error: '+err.message); }
+    try {
+        const { error } = await db.from('clientes').delete().eq('id', id);
+        if (error) throw error;
+        await loadClientes();
+    } catch(e) { alert('Error: ' + e.message); }
     showLoading(false);
 }
 
-function showLoading(s) { document.getElementById('loading').style.display = s?'block':'none'; }
+function showLoading(s) { document.getElementById('loading').style.display = s ? 'block' : 'none'; }
 
+// Init
 initMap();
 loadClientes();
-document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this)closeModal(); });
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 </script>
 </body>
 </html>
