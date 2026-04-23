@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Argentina - Hunter Douglas</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        header { background: linear-gradient(135deg,#1a1a2e,#0f3460); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        header h1 { font-size: 1.4em; font-weight: 600; }
+        .main-container { display: flex; height: calc(100vh - 60px); }
+        .sidebar { width: 320px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 15px; }
+        .map-container { flex: 1; position: relative; }
+        #map { width: 100%; height: 100%; }
+        .search-box { margin-bottom: 15px; }
+        .search-box input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .stats-panel { background: linear-gradient(135deg,#667eea,#764ba2); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .stats-panel h3 { font-size: 0.85em; opacity: 0.9; margin-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-item { background: rgba(255,255,255,0.2); padding: 8px; border-radius: 8px; text-align: center; }
+        .stat-item .number { font-size: 1.6em; font-weight: bold; }
+        .stat-item .label { font-size: 0.7em; opacity: 0.9; }
+        .filter-section { margin-bottom: 15px; }
+        .filter-section h4 { font-size: 0.85em; color: #555; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .filter-btn { display: inline-block; padding: 5px 10px; margin: 3px; border: 2px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; background: white; }
+        .filter-btn.active, .filter-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+        .client-list { max-height: 300px; overflow-y: auto; }
+        .client-card { background: #f8f9ff; border: 1px solid #e8ecff; border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+        .client-card:hover { background: #e8ecff; transform: translateX(3px); }
+        .client-card h5 { font-size: 0.85em; color: #333; margin-bottom: 3px; }
+        .client-card p { font-size: 0.75em; color: #666; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: 600; margin-top: 3px; }
+        .badge-activo { background: #d4edda; color: #155724; }
+        .badge-prospect { background: #fff3cd; color: #856404; }
+        .badge-inactivo { background: #f8d7da; color: #721c24; }
+        .popup-content { min-width: 200px; }
+        .popup-content h3 { color: #333; margin-bottom: 8px; font-size: 1em; }
+        .popup-content p { font-size: 0.85em; color: #555; margin: 3px 0; }
+        .btn-popup { display: block; width: 100%; padding: 6px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8em; margin-top: 8px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 15px; padding: 25px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { color: #333; margin-bottom: 20px; font-size: 1.2em; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85em; color: #555; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9em; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; width: 100%; margin-top: 10px; }
+        .btn-secondary { background: #f0f2f5; color: #333; border: 1px solid #ddd; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; width: 100%; margin-top: 5px; }
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
+        .fab:hover { transform: scale(1.1); }
+        .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: none; }
+        .legend { position: absolute; bottom: 30px; left: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; margin: 4px 0; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Mapa de Clientes - Hunter Douglas Argentina</h1>
+    <div style="font-size:0.8em;opacity:0.8" id="connection-status">Conectando...</div>
+</header>
+<div class="main-container">
+    <div class="sidebar">
+        <div class="search-box"><input type="text" id="search-input" placeholder="Buscar cliente..." oninput="filterClients()"></div>
+        <div class="stats-panel">
+            <h3>RESUMEN GENERAL</h3>
+            <div class="stats-grid">
+                <div class="stat-item"><div class="number" id="total-count">0</div><div class="label">Total</div></div>
+                <div class="stat-item"><div class="number" id="activo-count">0</div><div class="label">Activos</div></div>
+                <div class="stat-item"><div class="number" id="prospect-count">0</div><div class="label">Prospects</div></div>
+                <div class="stat-item"><div class="number" id="inactivo-count">0</div><div class="label">Inactivos</div></div>
+            </div>
+        </div>
+        <div class="filter-section">
+            <h4>Filtrar por Estado</h4>
+            <span class="filter-btn active" onclick="setFilter('todos',this)">Todos</span>
+            <span class="filter-btn" onclick="setFilter('Activo',this)">Activos</span>
+            <span class="filter-btn" onclick="setFilter('Prospect',this)">Prospects</span>
+            <span class="filter-btn" onclick="setFilter('Inactivo',this)">Inactivos</span>
+        </div>
+        <div class="filter-section">
+            <h4>Filtrar por Tipo</h4>
+            <span class="filter-btn active" onclick="setTipoFilter('todos',this)">Todos</span>
+            <span class="filter-btn" onclick="setTipoFilter('Distribuidor',this)">Distribuidores</span>
+            <span class="filter-btn" onclick="setTipoFilter('Arquitecto',this)">Arquitectos</span>
+            <span class="filter-btn" onclick="setTipoFilter('Decorador',this)">Decoradores</span>
+            <span class="filter-btn" onclick="setTipoFilter('Empresa',this)">Empresas</span>
+        </div>
+        <h4 style="font-size:0.85em;color:#555;margin-bottom:8px;font-weight:600;text-transform:uppercase">Lista de Clientes</h4>
+        <div class="client-list" id="client-list"></div>
+    </div>
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="legend">
+            <strong style="display:block;margin-bottom:5px">Estado</strong>
+            <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Activo</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospect</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Inactivo</div>
+        </div>
+    </div>
+</div>
+<button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
+<div class="loading" id="loading">Cargando...</div>
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <h2 id="modal-title">Agregar Cliente</h2>
+        <input type="hidden" id="edit-id">
+        <div class="form-group"><label>Nombre / Empresa *</label><input type="text" id="input-nombre" placeholder="Nombre del cliente"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Estado *</label><select id="input-estado"><option value="Activo">Activo</option><option value="Prospect">Prospect</option><option value="Inactivo">Inactivo</option></select></div>
+            <div class="form-group"><label>Tipo *</label><select id="input-tipo"><option value="Distribuidor">Distribuidor</option><option value="Arquitecto">Arquitecto</option><option value="Decorador">Decorador</option><option value="Empresa">Empresa</option><option value="Otro">Otro</option></select></div>
+        </div>
+        <div class="form-group"><label>Direccion *</label><input type="text" id="input-direccion" placeholder="Calle, numero, ciudad"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Latitud *</label><input type="number" id="input-lat" placeholder="-34.6037" step="any"></div>
+            <div class="form-group"><label>Longitud *</label><input type="number" id="input-lng" placeholder="-58.3816" step="any"></div>
+        </div>
+        <div class="form-group"><label>Telefono</label><input type="text" id="input-telefono" placeholder="+54 11 0000-0000"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="contacto@empresa.com"></div>
+        <div class="form-group"><label>Notas</label><textarea id="input-notas" rows="3" placeholder="Observaciones..."></textarea></div>
+        <button class="btn-primary" onclick="saveCliente()">Guardar</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+    </div>
+</div>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let map, markers = {}, allClientes = [], currentFilter = 'todos', currentTipoFilter = 'todos';
+const colors = { 'Activo': '#28a745', 'Prospect': '#ffc107', 'Inactivo': '#dc3545' };
+
+function createIcon(estado) {
+    const color = colors[estado] || '#6c757d';
+    return L.divIcon({ html: '<div style="width:18px;height:18px;background:' + color + ';border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>', className: '', iconSize: [18,18], iconAnchor: [9,9] });
+}
+
+function initMap() {
+    map = L.map('map', { center: [-38.4161,-63.6167], zoom: 5 });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '(c) OpenStreetMap', maxZoom: 18 }).addTo(map);
+    map.on('click', function(e) {
+        document.getElementById('input-lat').value = e.latlng.lat.toFixed(6);
+        document.getElementById('input-lng').value = e.latlng.lng.toFixed(6);
+    });
+}
+
+async function loadClientes() {
+    showLoading(true);
+    try {
+        const { data, error } = await supabaseClient.from('clientes').select('*').order('nombre');
+        if (error) throw error;
+        allClientes = data || [];
+        updateStats(); renderMap(); renderList();
+        document.getElementById('connection-status').textContent = 'Conectado';
+    } catch(err) {
+        document.getElementById('connection-status').textContent = 'Error: ' + err.message;
+    }
+    showLoading(false);
+}
+
+function updateStats() {
+    document.getElementById('total-count').textContent = allClientes.length;
+    document.getElementById('activo-count').textContent = allClientes.filter(c=>c.estado==='Activo').length;
+    document.getElementById('prospect-count').textContent = allClientes.filter(c=>c.estado==='Prospect').length;
+    document.getElementById('inactivo-count').textContent = allClientes.filter(c=>c.estado==='Inactivo').length;
+}
+
+function getFilteredClientes() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    return allClientes.filter(c => {
+        const mE = currentFilter === 'todos' || c.estado === currentFilter;
+        const mT = currentTipoFilter === 'todos' || c.tipo === currentTipoFilter;
+        const mS = !q || c.nombre.toLowerCase().includes(q) || (c.direccion && c.direccion.toLowerCase().includes(q));
+        return mE && mT && mS;
+    });
+}
+
+function renderMap() {
+    Object.values(markers).forEach(m => map.removeLayer(m));
+    markers = {};
+    getFilteredClientes().forEach(c => {
+        if (c.lat && c.lng) {
+            const m = L.marker([c.lat,c.lng], {icon: createIcon(c.estado)});
+            m.bindPopup('<div class="popup-content"><h3>' + c.nombre + '</h3><p>' + (c.direccion||'') + '</p><p>Estado: <strong>' + c.estado + '</strong></p><p>Tipo: ' + (c.tipo||'-') + '</p>' + (c.telefono?'<p>Tel: '+c.telefono+'</p>':'') + (c.email?'<p>Email: '+c.email+'</p>':'') + (c.notas?'<p>'+c.notas+'</p>':'') + '<button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup" style="background:#dc3545" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
+            m.addTo(map);
+            markers[c.id] = m;
+        }
+    });
+}
+
+function renderList() {
+    const list = document.getElementById('client-list');
+    const filtered = getFilteredClientes();
+    list.innerHTML = filtered.length === 0 ? '<p style="text-align:center;color:#999;font-size:0.85em">No hay clientes</p>' : '';
+    filtered.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'client-card';
+        div.innerHTML = '<h5>'+c.nombre+'</h5><p>'+(c.direccion||'Sin direccion')+'</p><span class="badge badge-'+(c.estado||'').toLowerCase()+'">'+c.estado+'</span>';
+        div.onclick = () => { if(markers[c.id]){ map.setView([c.lat,c.lng],13); markers[c.id].openPopup(); } };
+        list.appendChild(div);
+    });
+}
+
+function setFilter(f, btn) { currentFilter=f; document.querySelectorAll('.filter-section')[0].querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderMap(); renderList(); }
+function setTipoFilter(f, btn) { currentTipoFilter=f; document.querySelectorAll('.filter-section')[1].querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderMap(); renderList(); }
+function filterClients() { renderMap(); renderList(); }
+
+function openAddModal() {
+    document.getElementById('modal-title').textContent = 'Agregar Cliente';
+    ['edit-id','input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('input-estado').value = 'Activo';
+    document.getElementById('input-tipo').value = 'Distribuidor';
+    document.getElementById('modal-overlay').classList.add('active');
+}
+
+function editCliente(id) {
+    const c = allClientes.find(x=>x.id===id);
+    if (!c) return;
+    document.getElementById('modal-title').textContent = 'Editar Cliente';
+    document.getElementById('edit-id').value = id;
+    document.getElementById('input-nombre').value = c.nombre||'';
+    document.getElementById('input-estado').value = c.estado||'Activo';
+    document.getElementById('input-tipo').value = c.tipo||'Distribuidor';
+    document.getElementById('input-direccion').value = c.direccion||'';
+    document.getElementById('input-lat').value = c.lat||'';
+    document.getElementById('input-lng').value = c.lng||'';
+    document.getElementById('input-telefono').value = c.telefono||'';
+    document.getElementById('input-email').value = c.email||'';
+    document.getElementById('input-notas').value = c.notas||'';
+    document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+
+async function saveCliente() {
+    const nombre = document.getElementById('input-nombre').value.trim();
+    const lat = parseFloat(document.getElementById('input-lat').value);
+    const lng = parseFloat(document.getElementById('input-lng').value);
+    if (!nombre) { alert('El nombre es obligatorio'); return; }
+    if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias'); return; }
+    const data = { nombre, estado: document.getElementById('input-estado').value, tipo: document.getElementById('input-tipo').value, direccion: document.getElementById('input-direccion').value, lat, lng, telefono: document.getElementById('input-telefono').value, email: document.getElementById('input-email').value, notas: document.getElementById('input-notas').value };
+    showLoading(true);
+    const editId = document.getElementById('edit-id').value;
+    try {
+        if (editId) { await supabaseClient.from('clientes').update(data).eq('id',editId); }
+        else { await supabaseClient.from('clientes').insert(data); }
+        closeModal(); await loadClientes();
+    } catch(err) { alert('Error: '+err.message); }
+    showLoading(false);
+}
+
+async function deleteCliente(id) {
+    if (!confirm('Eliminar este cliente?')) return;
+    showLoading(true);
+    try { await supabaseClient.from('clientes').delete().eq('id',id); await loadClientes(); }
+    catch(err) { alert('Error: '+err.message); }
+    showLoading(false);
+}
+
+function showLoading(s) { document.getElementById('loading').style.display = s?'block':'none'; }
+
+initMap();
+loadClientes();
+document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this)closeModal(); });
+</script>
+</body>
+</html>
