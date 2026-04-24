@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS clientes (
     tipo        TEXT DEFAULT 'Distribuidor'
                 CHECK (tipo IN ('Distribuidor', 'Obra', 'Desarrolladora', 'Prospecto')),
     zona        TEXT
-                CHECK (zona IS NULL OR zona IN ('Norte', 'Sur', 'Este', 'Oeste', 'La Plata')),
+                				CHECK (zona IS NULL OR zona IN ('Norte', 'Sur', 'Este', 'Oeste', 'La Plata', 'CABA')),
     direccion   TEXT,
     lat         DECIMAL(10, 8),
     lng         DECIMAL(11, 8),
