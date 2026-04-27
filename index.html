@@ -119,7 +119,7 @@
         }
         .badge-dist   { background: #d4edda; color: #155724; }
         .badge-obras  { background: #ffe5cc; color: #7a3800; }
-        .badge-dev    { background: #cceef5; color: #0c5460; }
+        .badge-dev    { background: #f8d7da; color: #721c24; }.badge-dev-act  { background: #cceef5; color: #0c5460; }
         .badge-prosp  { background: #fff3cd; color: #856404; }
 
         .popup-content { min-width: 190px; font-size: 13px; }
@@ -220,7 +220,7 @@
                 <div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
                 <div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
                 <div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras</div></div>
-                <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
+                <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div><div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
             </div>
         </div>
 
@@ -231,7 +231,7 @@
                 <span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
                 <span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
                 <span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
-                <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladoras</span>
+                <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>                    <span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
                 <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
             </div>
         </div>
@@ -262,7 +262,7 @@
             <strong>Tipo de Cliente</strong>
             <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
             <div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div><div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
             <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
         </div>
     </div>
@@ -288,7 +288,7 @@
                 <select id="input-tipo">
                     <option value="Distribuidor">Distribuidor</option>
                     <option value="Obra">Obra ganada</option>
-                    <option value="Desarrolladora">Desarrolladora</option>
+                    <option value="Desarrolladora">Desarrolladora</option><option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
                     <option value="Prospecto">Prospecto</option>
                 </select>
             </div>
@@ -356,7 +356,7 @@ let zonasActivas = new Set(['ninguna']);
 const COLORES = {
     'Distribuidor':  '#28a745',
     'Obra':          '#fd7e14',
-    'Desarrolladora':'#17a2b8',
+    'Desarrolladora':'#dc3545','Desarrolladora-ACT':'#17a2b8',
     'Prospecto':     '#ffc107'
 };
 
@@ -399,7 +399,7 @@ function updateStats() {
     document.getElementById('cnt-total').textContent = allClientes.length;
     document.getElementById('cnt-dist').textContent  = allClientes.filter(c=>c.tipo==='Distribuidor').length;
     document.getElementById('cnt-obras').textContent = allClientes.filter(c=>c.tipo==='Obra').length;
-    document.getElementById('cnt-dev').textContent   = allClientes.filter(c=>c.tipo==='Desarrolladora').length;
+    document.getElementById('cnt-dev').textContent   = allClientes.filter(c=>c.tipo==='Desarrolladora').length;document.getElementById('cnt-dev-act').textContent = allClientes.filter(c=>c.tipo==='Desarrolladora-ACT').length;
 }
 
 function getFiltered() {
