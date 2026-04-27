@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS clientes (
     id          BIGSERIAL PRIMARY KEY,
     nombre      TEXT NOT NULL,
     tipo        TEXT DEFAULT 'Distribuidor'
-                CHECK (tipo IN ('Distribuidor', 'Obra', 'Desarrolladora', 'Prospecto')),
+                CHECK (tipo IN ('Distribuidor', 'Obra', 'Desarrolladora', 'Desarrolladora-ACT', 'Prospecto')),
     zona        TEXT
                 				CHECK (zona IS NULL OR zona IN ('Norte', 'Sur', 'Este', 'Oeste', 'La Plata', 'CABA')),
     direccion   TEXT,
@@ -55,7 +55,7 @@ CREATE TRIGGER update_clientes_updated_at
 -- UPDATE clientes SET tipo = 'Prospecto' WHERE tipo = 'Prospect';
 -- ALTER TABLE clientes DROP CONSTRAINT IF EXISTS clientes_tipo_check;
 -- ALTER TABLE clientes ADD CONSTRAINT clientes_tipo_check
---   CHECK (tipo IN ('Distribuidor','Obra','Desarrolladora','Prospecto'));
+--   CHECK (tipo IN ('Distribuidor','Obra','Desarrolladora','Desarrolladora-ACT','Prospecto'));
 -- =============================================
 
 -- 5. Datos de ejemplo (opcional)
