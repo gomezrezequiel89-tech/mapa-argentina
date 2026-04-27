@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: bhorder-box; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; }
 
         header {
@@ -87,7 +87,8 @@
         .tag:hover { opacity: 0.85; }
         .tag.active-dist   { background: #28a745; color: white; border-color: #28a745; }
         .tag.active-obras  { background: #fd7e14; color: white; border-color: #fd7e14; }
-        .tag.active-dev    { background: #17a2b8; color: white; border-color: #17a2b8; }
+        .tag.active-dev    { background: #dc3545; color: white; border-color: #dc3545; }
+        .tag.active-dev-act { background: #17a2b8; color: white; border-color: #17a2b8; }
         .tag.active-prosp  { background: #ffc107; color: #333; border-color: #ffc107; }
         .tag.active-zona   { background: #6f42c1; color: white; border-color: #6f42c1; }
         .tag.active-todos  { background: #495057; color: white; border-color: #495057; }
@@ -455,7 +456,7 @@ function renderList(filtered) {
     filtered.forEach(c => {
         const div = document.createElement('div');
         div.className = 'client-card';
-        const badgeClass = {Distribuidor:'dist',Obra:'obras',Desarrolladora:'dev',Prospecto:'prosp'}[c.tipo] || 'dist';
+        const badgeClass = {Distribuidor:'dist',Obra:'obras',Desarrolladora:'dev','Desarrolladora-ACT':'dev-act',Prospecto:'prosp'}[c.tipo] || 'dist';
         const zona = c.zona ? ' | ' + c.zona : '';
         div.innerHTML =
             '<h5>' + (c.nombre||'') + '</h5>' +
@@ -489,7 +490,7 @@ function toggleTipo(tipo, el) {
             el.className = 'tag';
         } else {
             tiposActivos.add(tipo);
-            const cls = {Distribuidor:'active-dist',Obra:'active-obras',Desarrolladora:'active-dev',Prospecto:'active-prosp'}[tipo];
+            const cls = {Distribuidor:'active-dist',Obra:'active-obras',Desarrolladora:'active-dev','Desarrolladora-ACT':'active-dev-act',Prospecto:'active-prosp'}[tipo];
             el.className = 'tag ' + cls;
         }
         if (tiposActivos.size === 0) {
