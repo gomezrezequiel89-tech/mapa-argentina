@@ -98,7 +98,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras gan.</div></div>
         <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
         <div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
-        <div class="stat-item"><div class="number" id="cnt-interior">0</div><div class="label">Interior</div></div>
         <div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
       </div>
     </div>
@@ -112,7 +111,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>
         <span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
         <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
-        <span class="tag" data-tipo="Interior" onclick="toggleTipo('Interior',this)"><span class="filter-dot" style="background:#9b59b6"></span> Interior</span>
         <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
       </div>
     </div>
@@ -128,6 +126,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
         <span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
         <span class="tag" data-zona="CABA" onclick="toggleZona('CABA',this)">CABA</span>
+        <span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
       </div>
     </div>
     <!-- LISTA -->
@@ -143,7 +142,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
       <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div>
       <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Interior</div>
       <div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
     </div>
   </div>
@@ -168,7 +166,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
           <option value="Desarrolladora">Desarrolladora</option>
           <option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
           <option value="Prospecto">Prospecto</option>
-          <option value="Interior">Interior</option>
           <option value="Obras">Obras</option>
         </select>
       </div>
@@ -182,6 +179,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
           <option value="Oeste">Oeste</option>
           <option value="La Plata">La Plata</option>
           <option value="CABA">CABA</option>
+          <option value="Interior">Interior</option>
         </select>
       </div>
     </div>
@@ -230,7 +228,6 @@ const COLORES = {
   'Desarrolladora': '#dc3545',
   'Desarrolladora-ACT': '#17a2b8',
   'Prospecto': '#ffc107',
-  'Interior': '#9b59b6',
   'Obras': '#1a237e'
 };
 
@@ -275,7 +272,6 @@ function updateStats() {
   document.getElementById('cnt-obras').textContent = allClientes.filter(c=>c.tipo==='Obra').length;
   document.getElementById('cnt-dev').textContent = allClientes.filter(c=>c.tipo==='Desarrolladora').length;
   document.getElementById('cnt-dev-act').textContent = allClientes.filter(c=>c.tipo==='Desarrolladora-ACT').length;
-  document.getElementById('cnt-interior').textContent = allClientes.filter(c=>c.tipo==='Interior').length;
   document.getElementById('cnt-obras-new').textContent = allClientes.filter(c=>c.tipo==='Obras').length;
 }
 
@@ -331,7 +327,7 @@ function renderList(filtered) {
     const badgeClass = {
       Distribuidor:'dist', Obra:'obras', Desarrolladora:'dev',
       'Desarrolladora-ACT':'dev-act', Prospecto:'prosp',
-      Interior:'interior', Obras:'obras-new'
+      Obras:'obras-new'
     }[c.tipo] || 'dist';
     div.innerHTML = '<h5>' + (c.nombre||'') + '</h5>' +
       '<p>' + (c.direccion||'Sin direccion') + '</p>' +
@@ -364,7 +360,7 @@ function toggleTipo(tipo, el) {
       const cls = {
         Distribuidor:'active-dist', Obra:'active-obras',
         Desarrolladora:'active-dev', 'Desarrolladora-ACT':'active-dev-act',
-        Prospecto:'active-prosp', Interior:'active-interior', Obras:'active-obras-new'
+        Prospecto:'active-prosp', Obras:'active-obras-new'
       }[tipo];
       el.className = 'tag ' + cls;
     }
