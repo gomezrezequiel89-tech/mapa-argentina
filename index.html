@@ -38,7 +38,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .tag.active-zona { background: #6f42c1; color: white; border-color: #6f42c1; }
 .tag.active-todos { background: #495057; color: white; border-color: #495057; }
 .tag.active-interior { background: #9b59b6; color: white; border-color: #9b59b6; }
-.tag.active-obras-new { background: #e67e22; color: white; border-color: #e67e22; }
+.tag.active-obras-new { background: #00796b; color: white; border-color: #00796b; }
 .zona-section { background: #f8f0ff; border: 1px solid #e0c8ff; border-radius: 8px; padding: 8px; margin-bottom: 12px; }
 .zona-note { font-size: 0.7em; color: #888; margin-bottom: 5px; font-style: italic; }
 .client-list { max-height: 220px; overflow-y: auto; margin-top: 4px; }
@@ -113,7 +113,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
         <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
         <span class="tag" data-tipo="Interior" onclick="toggleTipo('Interior',this)"><span class="filter-dot" style="background:#9b59b6"></span> Interior</span>
-        <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#e67e22"></span> Obras</span>
+        <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#00796b"></span> Obras</span>
       </div>
     </div>
     <!-- FILTRO ZONA (solo Buenos Aires) -->
@@ -144,7 +144,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
       <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
       <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Interior</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>Obras</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00796b"></div>Obras</div>
     </div>
   </div>
 </div>
@@ -231,7 +231,7 @@ const COLORES = {
   'Desarrolladora-ACT': '#17a2b8',
   'Prospecto': '#ffc107',
   'Interior': '#9b59b6',
-  'Obras': '#e67e22'
+  'Obras': '#00796b'
 };
 
 function colorDot(tipo) {
