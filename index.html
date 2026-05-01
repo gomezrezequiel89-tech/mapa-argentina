@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: bhorder-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; background: #f0f2f5; }
 header { background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); height: 56px; }
 header h1 { font-size: 1.2em; font-weight: 600; }
@@ -59,6 +59,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .popup-content p { color: #555; margin: 2px 0; font-size: 0.82em; }
 .btn-popup { display: block; width: 100%; padding: 5px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.78em; margin-top: 6px; }
 .btn-popup.red { background: #dc3545; }
+.btn-popup.orange { background: #fd7e14; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
 .modal { background: white; border-radius: 14px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
@@ -78,6 +79,34 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .legend-dot { width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; flex-shrink: 0; }
 #connection-status { font-size: 0.75em; opacity: 0.85; }
 .section-title { font-size: 0.75em; color: #444; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* === FOTOS STYLES === */
+.fotos-section { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+.fotos-section label { display: block; font-size: 0.8em; color: #555; margin-bottom: 6px; font-weight: 600; }
+.fotos-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.foto-thumb { position: relative; width: 70px; height: 70px; border-radius: 6px; overflow: hidden; border: 2px solid #ddd; }
+.foto-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.foto-thumb .remove-foto { position: absolute; top: 2px; right: 2px; background: rgba(220,53,69,0.9); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.upload-foto-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #f8f9ff; border: 2px dashed #667eea; border-radius: 7px; color: #667eea; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
+.upload-foto-btn:hover { background: #e8ecff; }
+.upload-progress { font-size: 0.75em; color: #667eea; margin-top: 4px; display: none; }
+/* === GALERIA FOTOS MODAL === */
+#galeria-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20000; align-items: center; justify-content: center; }
+#galeria-modal.active { display: flex; }
+.galeria-container { background: white; border-radius: 14px; padding: 20px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; position: relative; }
+.galeria-container h2 { color: #333; margin-bottom: 14px; font-size: 1.1em; }
+.galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.galeria-item { position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.2s; aspect-ratio: 1; }
+.galeria-item:hover { transform: scale(1.03); }
+.galeria-item img { width: 100%; height: 100%; object-fit: cover; }
+.galeria-empty { text-align: center; color: #999; font-size: 0.9em; padding: 30px; }
+.galeria-close { position: absolute; top: 14px; right: 14px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+/* Lightbox */
+#lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 30000; align-items: center; justify-content: center; }
+#lightbox.active { display: flex; }
+#lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+#lightbox .lb-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; }
+.foto-count-badge { display: inline-block; background: #fd7e14; color: white; border-radius: 10px; font-size: 0.65em; padding: 1px 6px; margin-left: 4px; vertical-align: middle; }
 </style>
 </head>
 <body>
@@ -101,7 +130,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
       </div>
     </div>
-    <!-- FILTRO TIPOS -->
     <div class="filter-section">
       <div class="filter-title">Tipo de Cliente</div>
       <div class="filter-tags" id="tags-tipo">
@@ -114,7 +142,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
       </div>
     </div>
-    <!-- FILTRO ZONA (solo Buenos Aires) -->
     <div class="filter-section zona-section">
       <div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
       <div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
@@ -129,7 +156,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
         <span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
       </div>
     </div>
-    <!-- LISTA -->
     <div class="section-title">Lista de Clientes</div>
     <div class="client-list" id="client-list"></div>
   </div>
@@ -148,7 +174,8 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 </div>
 <button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
 <div class="loading" id="loading">Cargando...</div>
-<!-- MODAL -->
+
+<!-- MODAL AGREGAR/EDITAR CLIENTE -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <h2 id="modal-title">Agregar Cliente</h2>
@@ -160,7 +187,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
     <div class="form-row">
       <div class="form-group">
         <label>Tipo *</label>
-        <select id="input-tipo">
+        <select id="input-tipo" onchange="toggleFotosSection()">
           <option value="Distribuidor">Distribuidor</option>
           <option value="Obra">Obra ganada</option>
           <option value="Desarrolladora">Desarrolladora</option>
@@ -209,18 +236,48 @@ header h1 { font-size: 1.2em; font-weight: 600; }
       <label>Notas</label>
       <textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea>
     </div>
-    <div style="font-size:0.75em;color:#888;margin-bottom:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
+    <!-- SECCION FOTOS (solo para Obras ganadas) -->
+    <div class="fotos-section" id="fotos-section" style="display:none">
+      <label>Fotos de la Obra</label>
+      <div class="fotos-preview" id="fotos-preview"></div>
+      <label class="upload-foto-btn" for="input-fotos-file">
+        <span>&#128247;</span> Agregar fotos
+      </label>
+      <input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
+      <div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
+    </div>
+    <div style="font-size:0.75em;color:#888;margin-bottom:8px;margin-top:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
     <button class="btn-primary" onclick="saveCliente()">Guardar</button>
     <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
   </div>
 </div>
+
+<!-- MODAL GALERIA DE FOTOS -->
+<div id="galeria-modal">
+  <div class="galeria-container">
+    <button class="galeria-close" onclick="closeGaleria()">&times;</button>
+    <h2 id="galeria-titulo">Fotos de la Obra</h2>
+    <div class="galeria-grid" id="galeria-grid"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" src="" alt="Foto obra">
+</div>
+
 <script src="config.js"></script>
 <script>
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const STORAGE_BUCKET = 'obras-fotos';
 let map, markers = {}, allClientes = [];
 let tiposActivos = new Set(['todos']);
 let zonasActivas = new Set(['ninguna']);
+let fotosNuevas = []; // URLs de fotos recien subidas
+let fotosExistentes = []; // URLs de fotos ya guardadas en DB
+let fotosEliminadas = []; // URLs a eliminar
 
 const COLORES = {
   'Distribuidor': '#28a745',
@@ -296,14 +353,22 @@ function applyFilters() {
     if (!c.lat || !c.lng) return;
     const m = L.marker([c.lat, c.lng], { icon: colorDot(c.tipo) });
     const zona = c.zona ? ' | Zona: ' + c.zona : '';
+    const fotos = c.fotos || [];
+    const fotosBadge = (c.tipo === 'Obra' && fotos.length > 0)
+      ? '<span style="font-size:0.75em;color:#fd7e14;margin-left:4px">&#128247; ' + fotos.length + ' foto' + (fotos.length>1?'s':'') + '</span>'
+      : '';
+    const fotosBtn = (c.tipo === 'Obra')
+      ? '<button class="btn-popup orange" onclick="verFotos(' + c.id + ')">&#128247; Ver Fotos' + (fotos.length > 0 ? ' (' + fotos.length + ')' : '') + '</button>'
+      : '';
     m.bindPopup(
       '<div class="popup-content">' +
-      '<h3>' + (c.nombre||'') + '</h3>' +
+      '<h3>' + (c.nombre||'') + fotosBadge + '</h3>' +
       '<p>Tipo: <strong>' + (c.tipo||'-') + '</strong>' + zona + '</p>' +
       '<p>' + (c.direccion||'Sin direccion') + '</p>' +
       (c.telefono ? '<p>Tel: ' + c.telefono + '</p>' : '') +
       (c.email ? '<p>Email: ' + c.email + '</p>' : '') +
       (c.notas ? '<p>' + c.notas + '</p>' : '') +
+      fotosBtn +
       '<button class="btn-popup" onclick="editCliente(' + c.id + ')">Editar</button>' +
       '<button class="btn-popup red" onclick="deleteCliente(' + c.id + ')">Eliminar</button>' +
       '</div>'
@@ -324,12 +389,12 @@ function renderList(filtered) {
   filtered.forEach(c => {
     const div = document.createElement('div');
     div.className = 'client-card';
-    const badgeClass = {
-      Distribuidor:'dist', Obra:'obras', Desarrolladora:'dev',
-      'Desarrolladora-ACT':'dev-act', Prospecto:'prosp',
-      Obras:'obras-new'
-    }[c.tipo] || 'dist';
-    div.innerHTML = '<h5>' + (c.nombre||'') + '</h5>' +
+    const badgeClass = { Distribuidor:'dist', Obra:'obras', Desarrolladora:'dev', 'Desarrolladora-ACT':'dev-act', Prospecto:'prosp', Obras:'obras-new' }[c.tipo] || 'dist';
+    const fotos = c.fotos || [];
+    const fotosIcon = (c.tipo === 'Obra' && fotos.length > 0)
+      ? '<span class="foto-count-badge">&#128247; ' + fotos.length + '</span>'
+      : '';
+    div.innerHTML = '<h5>' + (c.nombre||'') + fotosIcon + '</h5>' +
       '<p>' + (c.direccion||'Sin direccion') + '</p>' +
       '<span class="badge badge-' + badgeClass + '">' + (c.tipo||'') + '</span>' +
       (c.zona ? '<span style="font-size:0.65em;color:#888;margin-left:4px">' + c.zona + '</span>' : '');
@@ -357,11 +422,7 @@ function toggleTipo(tipo, el) {
       el.className = 'tag';
     } else {
       tiposActivos.add(tipo);
-      const cls = {
-        Distribuidor:'active-dist', Obra:'active-obras',
-        Desarrolladora:'active-dev', 'Desarrolladora-ACT':'active-dev-act',
-        Prospecto:'active-prosp', Obras:'active-obras-new'
-      }[tipo];
+      const cls = { Distribuidor:'active-dist', Obra:'active-obras', Desarrolladora:'active-dev', 'Desarrolladora-ACT':'active-dev-act', Prospecto:'active-prosp', Obras:'active-obras-new' }[tipo];
       el.className = 'tag ' + cls;
     }
     if (tiposActivos.size === 0) {
@@ -395,12 +456,23 @@ function toggleZona(zona, el) {
   applyFilters();
 }
 
+function toggleFotosSection() {
+  const tipo = document.getElementById('input-tipo').value;
+  const section = document.getElementById('fotos-section');
+  section.style.display = (tipo === 'Obra') ? 'block' : 'none';
+}
+
 function openAddModal() {
   document.getElementById('modal-title').textContent = 'Agregar Cliente';
   document.getElementById('edit-id').value = '';
   ['input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('input-tipo').value = 'Distribuidor';
   document.getElementById('input-zona').value = '';
+  fotosNuevas = [];
+  fotosExistentes = [];
+  fotosEliminadas = [];
+  renderFotosPreview();
+  toggleFotosSection();
   document.getElementById('modal-overlay').classList.add('active');
 }
 
@@ -418,11 +490,65 @@ function editCliente(id) {
   document.getElementById('input-telefono').value = c.telefono || '';
   document.getElementById('input-email').value = c.email || '';
   document.getElementById('input-notas').value = c.notas || '';
+  fotosNuevas = [];
+  fotosExistentes = [...(c.fotos || [])];
+  fotosEliminadas = [];
+  renderFotosPreview();
+  toggleFotosSection();
   document.getElementById('modal-overlay').classList.add('active');
+  // Close popup if open
+  map.closePopup();
 }
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ===== FOTOS LOGIC =====
+async function handleFotosUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  const progress = document.getElementById('upload-progress');
+  progress.style.display = 'block';
+  progress.textContent = 'Subiendo ' + files.length + ' foto(s)...';
+  for (const file of files) {
+    const ext = file.name.split('.').pop();
+    const filename = Date.now() + '_' + Math.random().toString(36).substr(2,8) + '.' + ext;
+    const { data, error } = await db.storage.from(STORAGE_BUCKET).upload(filename, file, { cacheControl: '3600', upsert: false });
+    if (error) {
+      console.error('Error subiendo foto:', error);
+      continue;
+    }
+    const { data: urlData } = db.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
+    fotosNuevas.push(urlData.publicUrl);
+  }
+  progress.style.display = 'none';
+  event.target.value = '';
+  renderFotosPreview();
+}
+
+function renderFotosPreview() {
+  const container = document.getElementById('fotos-preview');
+  const todasFotos = [...fotosExistentes, ...fotosNuevas];
+  container.innerHTML = '';
+  todasFotos.forEach((url, idx) => {
+    const isExisting = idx < fotosExistentes.length;
+    const div = document.createElement('div');
+    div.className = 'foto-thumb';
+    div.innerHTML = '<img src="' + url + '" alt="foto ' + (idx+1) + '" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\'><rect width=\'70\' height=\'70\' fill=\'%23eee\'/></svg>'">' +
+      '<button class="remove-foto" onclick="removeFoto(' + idx + ','' + url + '',' + isExisting + ')" title="Eliminar">&times;</button>';
+    container.appendChild(div);
+  });
+}
+
+function removeFoto(idx, url, isExisting) {
+  if (isExisting) {
+    fotosExistentes = fotosExistentes.filter(u => u !== url);
+    fotosEliminadas.push(url);
+  } else {
+    fotosNuevas = fotosNuevas.filter(u => u !== url);
+  }
+  renderFotosPreview();
 }
 
 async function saveCliente() {
@@ -431,15 +557,17 @@ async function saveCliente() {
   const lng = parseFloat(document.getElementById('input-lng').value);
   if (!nombre) { alert('El nombre es obligatorio'); return; }
   if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias. Hace clic en el mapa o ingresalas manualmente.'); return; }
+  const tipo = document.getElementById('input-tipo').value;
+  const todasFotos = (tipo === 'Obra') ? [...fotosExistentes, ...fotosNuevas] : [];
   const payload = {
-    nombre,
-    tipo: document.getElementById('input-tipo').value,
+    nombre, tipo,
     zona: document.getElementById('input-zona').value || null,
     direccion: document.getElementById('input-direccion').value,
     lat, lng,
     telefono: document.getElementById('input-telefono').value,
     email: document.getElementById('input-email').value,
-    notas: document.getElementById('input-notas').value
+    notas: document.getElementById('input-notas').value,
+    fotos: todasFotos
   };
   showLoading(true);
   const editId = document.getElementById('edit-id').value;
@@ -472,14 +600,58 @@ async function deleteCliente(id) {
   showLoading(false);
 }
 
+// ===== GALERIA =====
+function verFotos(id) {
+  const c = allClientes.find(x => x.id === id);
+  if (!c) return;
+  const fotos = c.fotos || [];
+  document.getElementById('galeria-titulo').textContent = 'Fotos: ' + (c.nombre || '');
+  const grid = document.getElementById('galeria-grid');
+  if (fotos.length === 0) {
+    grid.innerHTML = '<div class="galeria-empty">&#128247; No hay fotos para esta obra.<br><br><small>Editala para agregar fotos.</small></div>';
+  } else {
+    grid.innerHTML = '';
+    fotos.forEach((url, i) => {
+      const div = document.createElement('div');
+      div.className = 'galeria-item';
+      div.onclick = () => openLightbox(url);
+      div.innerHTML = '<img src="' + url + '" alt="Foto ' + (i+1) + '" loading="lazy">';
+      grid.appendChild(div);
+    });
+  }
+  document.getElementById('galeria-modal').classList.add('active');
+  map.closePopup();
+}
+
+function closeGaleria() {
+  document.getElementById('galeria-modal').classList.remove('active');
+}
+
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('active');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.getElementById('lightbox-img').src = '';
+}
+
 function showLoading(s) {
   document.getElementById('loading').style.display = s ? 'block' : 'none';
 }
 
 initMap();
 loadClientes();
+
 document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
+});
+document.getElementById('galeria-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeGaleria();
+});
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeLightbox();
 });
 </script>
 </body>
