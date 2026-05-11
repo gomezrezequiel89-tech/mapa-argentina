@@ -16,6 +16,14 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .sidebar { width: 280px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 12px; flex-shrink: 0; }
 .map-container { flex: 1; position: relative; }
 #map { width: 100%; height: 100%; }
+.right-panel { width: 240px; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 12px; flex-shrink: 0; }
+.right-panel h3 { font-size: 0.75em; color: #444; margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 10px; border-radius: 8px; }
+.right-panel .filter-group { margin-bottom: 14px; }
+.right-panel .filter-group label { display: block; font-size: 0.75em; color: #555; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.right-panel select { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.82em; background: white; cursor: pointer; }
+.right-panel .btn-clear-filters { width: 100%; padding: 7px; background: #f0f2f5; color: #555; border: 1px solid #ddd; border-radius: 7px; cursor: pointer; font-size: 0.8em; margin-top: 4px; }
+.right-panel .btn-clear-filters:hover { background: #e0e0e0; }
+.right-panel .filter-count { font-size: 0.7em; color: #888; text-align: center; margin-top: 8px; }
 .search-box { margin-bottom: 12px; }
 .search-box input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; }
 .stats-panel { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; }
@@ -70,7 +78,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 0.88em; width: 100%; margin-top: 8px; }
 .btn-secondary { background: #f0f2f5; color: #333; border: 1px solid #ddd; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 0.88em; width: 100%; margin-top: 5px; }
-.fab { position: fixed; bottom: 25px; right: 25px; width: 52px; height: 52px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
+.fab { position: fixed; bottom: 25px; right: 265px; width: 52px; height: 52px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
 .fab:hover { transform: scale(1.1); }
 .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 18px 28px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: none; }
 .legend { position: absolute; bottom: 25px; left: 10px; background: white; padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 11px; }
@@ -79,7 +87,9 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .legend-dot { width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; flex-shrink: 0; }
 #connection-status { font-size: 0.75em; opacity: 0.85; }
 .section-title { font-size: 0.75em; color: #444; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
+.obra-fields { display: none; border: 1px solid #e0c8ff; border-radius: 8px; padding: 10px; background: #f8f0ff; margin-bottom: 12px; }
+.obra-fields.visible { display: block; }
+.obra-fields .obra-fields-title { font-size: 0.75em; color: #6f42c1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 /* === FOTOS STYLES === */
 .fotos-section { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
 .fotos-section label { display: block; font-size: 0.8em; color: #555; margin-bottom: 6px; font-weight: 600; }
@@ -111,162 +121,212 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 </head>
 <body>
 <header>
-  <div style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="Hunter Douglas" style="height:40px;"><h1>Mapa de Clientes - Hunter Douglas Argentina</h1></div>
-  <div id="connection-status">Conectando...</div>
+<div style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="Hunter Douglas" style="height:40px;"><h1>Mapa de Clientes - Hunter Douglas Argentina</h1></div>
+<div id="connection-status">Conectando...</div>
 </header>
 <div class="main-container">
-  <div class="sidebar">
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()">
-    </div>
-    <div class="stats-panel">
-      <h3>RESUMEN</h3>
-      <div class="stats-grid">
-        <div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
-        <div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
-        <div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras gan.</div></div>
-        <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
-        <div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
-        <div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
-      </div>
-    </div>
-    <div class="filter-section">
-      <div class="filter-title">Tipo de Cliente</div>
-      <div class="filter-tags" id="tags-tipo">
-        <span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
-        <span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
-        <span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
-        <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>
-        <span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
-        <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
-        <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
-      </div>
-    </div>
-    <div class="filter-section zona-section">
-      <div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
-      <div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
-      <div class="filter-tags" id="tags-zona">
-        <span class="tag" data-zona="ninguna" onclick="toggleZona('ninguna',this)">Sin filtro</span>
-        <span class="tag" data-zona="Norte" onclick="toggleZona('Norte',this)">Norte</span>
-        <span class="tag" data-zona="Sur" onclick="toggleZona('Sur',this)">Sur</span>
-        <span class="tag" data-zona="Este" onclick="toggleZona('Este',this)">Este</span>
-        <span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
-        <span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
-        <span class="tag" data-zona="CABA" onclick="toggleZona('CABA',this)">CABA</span>
-        <span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
-      </div>
-    </div>
-    <div class="section-title">Lista de Clientes</div>
-    <div class="client-list" id="client-list"></div>
-  </div>
-  <div class="map-container">
-    <div id="map"></div>
-    <div class="legend">
-      <strong>Tipo de Cliente</strong>
-      <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
-    </div>
-  </div>
+<div class="sidebar">
+<div class="search-box">
+<input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()">
+</div>
+<div class="stats-panel">
+<h3>RESUMEN</h3>
+<div class="stats-grid">
+<div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
+<div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
+<div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras gan.</div></div>
+<div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
+<div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
+<div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
+</div>
+</div>
+<div class="filter-section">
+<div class="filter-title">Tipo de Cliente</div>
+<div class="filter-tags" id="tags-tipo">
+<span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
+<span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
+<span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
+<span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>
+<span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
+<span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
+<span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
+</div>
+</div>
+<div class="filter-section zona-section">
+<div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
+<div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
+<div class="filter-tags" id="tags-zona">
+<span class="tag" data-zona="ninguna" onclick="toggleZona('ninguna',this)">Sin filtro</span>
+<span class="tag" data-zona="Norte" onclick="toggleZona('Norte',this)">Norte</span>
+<span class="tag" data-zona="Sur" onclick="toggleZona('Sur',this)">Sur</span>
+<span class="tag" data-zona="Este" onclick="toggleZona('Este',this)">Este</span>
+<span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
+<span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
+<span class="tag" data-zona="CABA" onclick="toggleZona('CABA',this)">CABA</span>
+<span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
+</div>
+</div>
+<div class="section-title">Lista de Clientes</div>
+<div class="client-list" id="client-list"></div>
+</div>
+<div class="map-container">
+<div id="map"></div>
+<div class="legend">
+<strong>Tipo de Cliente</strong>
+<div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
+<div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
+<div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div>
+<div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
+<div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
+<div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
+</div>
+</div>
+<!-- PANEL DERECHO DE FILTROS -->
+<div class="right-panel">
+<h3>&#128269; Filtrar Obras</h3>
+<div class="filter-group">
+<label>Categoria</label>
+<select id="filter-categoria" onchange="onFilterCategoriaChange()">
+<option value="">-- Todas --</option>
+<option value="Control Solar">Control Solar</option>
+<option value="Cielos Rasos">Cielos Rasos</option>
+<option value="Fachadas">Fachadas</option>
+</select>
+</div>
+<div class="filter-group">
+<label>Sub-Categoria</label>
+<select id="filter-subcategoria" onchange="applyFilters()">
+<option value="">-- Todas --</option>
+</select>
+</div>
+<div class="filter-group">
+<label>Producto</label>
+<select id="filter-producto" onchange="applyFilters()">
+<option value="">-- Todos --</option>
+</select>
+</div>
+<button class="btn-clear-filters" onclick="clearRightFilters()">&#10006; Limpiar filtros</button>
+<div class="filter-count" id="filter-count"></div>
+</div>
 </div>
 <button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
 <div class="loading" id="loading">Cargando...</div>
-
 <!-- MODAL AGREGAR/EDITAR CLIENTE -->
 <div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <h2 id="modal-title">Agregar Cliente</h2>
-    <input type="hidden" id="edit-id">
-    <div class="form-group">
-      <label>Nombre / Empresa *</label>
-      <input type="text" id="input-nombre" placeholder="Nombre del cliente o empresa">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Tipo *</label>
-        <select id="input-tipo" onchange="toggleFotosSection()">
-          <option value="Distribuidor">Distribuidor</option>
-          <option value="Obra">Obra ganada</option>
-          <option value="Desarrolladora">Desarrolladora</option>
-          <option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
-          <option value="Prospecto">Prospecto</option>
-          <option value="Obras">Obras</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Zona (si es Bs As)</label>
-        <select id="input-zona">
-          <option value="">Sin zona</option>
-          <option value="Norte">Norte</option>
-          <option value="Sur">Sur</option>
-          <option value="Este">Este</option>
-          <option value="Oeste">Oeste</option>
-          <option value="La Plata">La Plata</option>
-          <option value="CABA">CABA</option>
-          <option value="Interior">Interior</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Direccion</label>
-      <input type="text" id="input-direccion" placeholder="Calle, numero, ciudad">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Latitud *</label>
-        <input type="number" id="input-lat" placeholder="-34.6037" step="any">
-      </div>
-      <div class="form-group">
-        <label>Longitud *</label>
-        <input type="number" id="input-lng" placeholder="-58.3816" step="any">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Telefono</label>
-      <input type="text" id="input-telefono" placeholder="+54 11 0000-0000">
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="input-email" placeholder="contacto@empresa.com">
-    </div>
-    <div class="form-group">
-      <label>Notas</label>
-      <textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea>
-    </div>
-    <!-- SECCION FOTOS (solo para Obras ganadas) -->
-    <div class="fotos-section" id="fotos-section" style="display:none">
-      <label>Fotos de la Obra</label>
-      <div class="fotos-preview" id="fotos-preview"></div>
-      <label class="upload-foto-btn" for="input-fotos-file">
-        <span>&#128247;</span> Agregar fotos
-      </label>
-      <input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
-      <div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
-    </div>
-    <div style="font-size:0.75em;color:#888;margin-bottom:8px;margin-top:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
-    <button class="btn-primary" onclick="saveCliente()">Guardar</button>
-    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-  </div>
+<div class="modal">
+<h2 id="modal-title">Agregar Cliente</h2>
+<input type="hidden" id="edit-id">
+<div class="form-group">
+<label>Nombre / Empresa *</label>
+<input type="text" id="input-nombre" placeholder="Nombre del cliente o empresa">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Tipo *</label>
+<select id="input-tipo" onchange="toggleObraFields()">
+<option value="Distribuidor">Distribuidor</option>
+<option value="Obra">Obra ganada</option>
+<option value="Desarrolladora">Desarrolladora</option>
+<option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
+<option value="Prospecto">Prospecto</option>
+<option value="Obras">Obras</option>
+</select>
+</div>
+<div class="form-group">
+<label>Zona (si es Bs As)</label>
+<select id="input-zona">
+<option value="">Sin zona</option>
+<option value="Norte">Norte</option>
+<option value="Sur">Sur</option>
+<option value="Este">Este</option>
+<option value="Oeste">Oeste</option>
+<option value="La Plata">La Plata</option>
+<option value="CABA">CABA</option>
+<option value="Interior">Interior</option>
+</select>
+</div>
+</div>
+<!-- CAMPOS EXTRA PARA OBRA GANADA -->
+<div class="obra-fields" id="obra-fields">
+<div class="obra-fields-title">&#127970; Datos de la Obra</div>
+<div class="form-group">
+<label>Categoria</label>
+<select id="input-categoria" onchange="onCategoriasChange()">
+<option value="">-- Seleccionar --</option>
+<option value="Control Solar">Control Solar</option>
+<option value="Cielos Rasos">Cielos Rasos</option>
+<option value="Fachadas">Fachadas</option>
+</select>
+</div>
+<div class="form-group">
+<label>Sub-Categoria</label>
+<select id="input-subcategoria" onchange="onSubcategoriaChange()">
+<option value="">-- Seleccionar --</option>
+</select>
+</div>
+<div class="form-group">
+<label>Producto</label>
+<select id="input-producto">
+<option value="">-- Seleccionar --</option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label>Direccion</label>
+<input type="text" id="input-direccion" placeholder="Calle, numero, ciudad">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Latitud *</label>
+<input type="number" id="input-lat" placeholder="-34.6037" step="any">
+</div>
+<div class="form-group">
+<label>Longitud *</label>
+<input type="number" id="input-lng" placeholder="-58.3816" step="any">
+</div>
+</div>
+<div class="form-group">
+<label>Telefono</label>
+<input type="text" id="input-telefono" placeholder="+54 11 0000-0000">
+</div>
+<div class="form-group">
+<label>Email</label>
+<input type="email" id="input-email" placeholder="contacto@empresa.com">
+</div>
+<div class="form-group">
+<label>Notas</label>
+<textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea>
+</div>
+<!-- SECCION FOTOS (solo para Obras ganadas) -->
+<div class="fotos-section" id="fotos-section" style="display:none">
+<label>Fotos de la Obra</label>
+<div class="fotos-preview" id="fotos-preview"></div>
+<label class="upload-foto-btn" for="input-fotos-file">
+<span>&#128247;</span> Agregar fotos
+</label>
+<input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
+<div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
+</div>
+<div style="font-size:0.75em;color:#888;margin-bottom:8px;margin-top:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
+<button class="btn-primary" onclick="saveCliente()">Guardar</button>
+<button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+</div>
 </div>
 
 <!-- MODAL GALERIA DE FOTOS -->
 <div id="galeria-modal">
-  <div class="galeria-container">
-    <button class="galeria-close" onclick="closeGaleria()">&times;</button>
-    <h2 id="galeria-titulo">Fotos de la Obra</h2>
-    <div class="galeria-grid" id="galeria-grid"></div>
-  </div>
+<div class="galeria-container">
+<button class="galeria-close" onclick="closeGaleria()">&times;</button>
+<h2 id="galeria-titulo">Fotos de la Obra</h2>
+<div class="galeria-grid" id="galeria-grid"></div>
+</div>
 </div>
 
 <!-- LIGHTBOX -->
 <div id="lightbox">
-  <button class="lb-close" onclick="closeLightbox()">&times;</button>
-  <img id="lightbox-img" src="" alt="Foto obra">
+<button class="lb-close" onclick="closeLightbox()">&times;</button>
+<img id="lightbox-img" src="" alt="Foto obra">
 </div>
-
 <script src="config.js"></script>
 <script>
 const { createClient } = supabase;
@@ -275,9 +335,32 @@ const STORAGE_BUCKET = 'obras-fotos';
 let map, markers = {}, allClientes = [];
 let tiposActivos = new Set(['todos']);
 let zonasActivas = new Set(['ninguna']);
-let fotosNuevas = []; // URLs de fotos recien subidas
-let fotosExistentes = []; // URLs de fotos ya guardadas en DB
-let fotosEliminadas = []; // URLs a eliminar
+let fotosNuevas = [];
+let fotosExistentes = [];
+let fotosEliminadas = [];
+
+// Datos de Categoria / Sub-Categoria / Producto
+const CATEGORIAS_DATA = {
+  "Control Solar": {
+    "Cortasoles de Madera": ["Woodbrise"],
+    "Cortasoles Accionables": ["Persiana Exterior de Aluminio 80MM","Fins","MetalBrise","Aeroscreen Plus","Windscreen","Aerowing"],
+    "Cortasoles Lineales": ["Fins","NBK","Quadrobrise 32x32","Quadrobrise 25/50 - 25/75 - 40/60 - 40/100","Tubrise","Aerobrise 100 - 200","Celoscreen","Sunlines","30B - 50B -50BD","Celosia C23 - C40","Celosia 70S","H2-SL4","Minitubrise"],
+    "Cortasoles Reticulados": ["Brisolcell","Filigree"],
+    "Paneles Screen": ["ScreenPanel","Stripscreen","Quadrolines 30x15 / 15x10","Mallas GKD","Stripwave"],
+    "Folding / Sliding Shutter": ["Folding / Sliding Shutter"]
+  },
+  "Cielos Rasos": {
+    "Lineal": ["Lineal C38","Lineal C50","Lineal C84","Lineal C100","Lineal C150","Lineal C200","Lineal C300"],
+    "Bandejas": ["Bandejas Curvada","Bandejas Perforada","Bandejas Lisa"],
+    "Celdas": ["Celdas Cuadrada","Celdas Hexagonal","Celdas Triangular"],
+    "Lamas": ["Lama Curvada","Lama Triangular","Lama Plana"]
+  },
+  "Fachadas": {
+    "Cassette": ["Cassette 500","Cassette 1000"],
+    "Planchas": ["Planchas Perforadas","Planchas Lisas"],
+    "FUSSION": ["Deck moso Bamboo Xtreme","Deck de Composite","Revestimiento Bamboo","Revestimiento Composite"]
+  }
+};
 
 const COLORES = {
   'Distribuidor': '#28a745',
@@ -334,6 +417,9 @@ function updateStats() {
 
 function getFiltered() {
   const q = document.getElementById('search-input').value.toLowerCase();
+  const filterCat = document.getElementById('filter-categoria').value;
+  const filterSub = document.getElementById('filter-subcategoria').value;
+  const filterProd = document.getElementById('filter-producto').value;
   return allClientes.filter(c => {
     const matchTipo = tiposActivos.has('todos') || tiposActivos.has(c.tipo);
     let matchZona = true;
@@ -341,7 +427,25 @@ function getFiltered() {
       matchZona = c.zona && zonasActivas.has(c.zona);
     }
     const matchSearch = !q || (c.nombre||'').toLowerCase().includes(q) || (c.direccion||'').toLowerCase().includes(q);
-    return matchTipo && matchZona && matchSearch;
+    // Filter by categoria/subcategoria/producto only applies to Obras
+    let matchCat = true;
+    if (filterCat && c.tipo === 'Obra') {
+      matchCat = c.categoria === filterCat;
+    } else if (filterCat && c.tipo !== 'Obra') {
+      matchCat = false;
+    }
+    let matchSub = true;
+    if (filterSub && c.tipo === 'Obra') {
+      matchSub = c.subcategoria === filterSub;
+    }
+    let matchProd = true;
+    if (filterProd && c.tipo === 'Obra') {
+      matchProd = c.producto === filterProd;
+    }
+    // If any categoria filter is active, only show Obra type
+    const hasFilter = filterCat || filterSub || filterProd;
+    if (hasFilter && c.tipo !== 'Obra') return false;
+    return matchTipo && matchZona && matchSearch && matchCat && matchSub && matchProd;
   });
 }
 
@@ -360,10 +464,14 @@ function applyFilters() {
     const fotosBtn = (c.tipo === 'Obra')
       ? '<button class="btn-popup orange" onclick="verFotos(' + c.id + ')">&#128247; Ver Fotos' + (fotos.length > 0 ? ' (' + fotos.length + ')' : '') + '</button>'
       : '';
+    const catInfo = (c.tipo === 'Obra' && c.categoria)
+      ? '<p>' + c.categoria + (c.subcategoria ? ' / ' + c.subcategoria : '') + (c.producto ? ' / ' + c.producto : '') + '</p>'
+      : '';
     m.bindPopup(
       '<div class="popup-content">' +
       '<h3>' + (c.nombre||'') + fotosBadge + '</h3>' +
       '<p>Tipo: <strong>' + (c.tipo||'-') + '</strong>' + zona + '</p>' +
+      catInfo +
       '<p>' + (c.direccion||'Sin direccion') + '</p>' +
       (c.telefono ? '<p>Tel: ' + c.telefono + '</p>' : '') +
       (c.email ? '<p>Email: ' + c.email + '</p>' : '') +
@@ -377,6 +485,19 @@ function applyFilters() {
     markers[c.id] = m;
   });
   renderList(filtered);
+  updateFilterCount(filtered.length);
+}
+
+function updateFilterCount(count) {
+  const filterCat = document.getElementById('filter-categoria').value;
+  const filterSub = document.getElementById('filter-subcategoria').value;
+  const filterProd = document.getElementById('filter-producto').value;
+  const el = document.getElementById('filter-count');
+  if (filterCat || filterSub || filterProd) {
+    el.textContent = count + ' obra(s) encontrada(s)';
+  } else {
+    el.textContent = '';
+  }
 }
 
 function renderList(filtered) {
@@ -394,9 +515,13 @@ function renderList(filtered) {
     const fotosIcon = (c.tipo === 'Obra' && fotos.length > 0)
       ? '<span class="foto-count-badge">&#128247; ' + fotos.length + '</span>'
       : '';
+    const catTag = (c.tipo === 'Obra' && c.categoria)
+      ? '<span style="font-size:0.65em;color:#6f42c1;margin-left:4px">' + c.categoria + '</span>'
+      : '';
     div.innerHTML = '<h5>' + (c.nombre||'') + fotosIcon + '</h5>' +
       '<p>' + (c.direccion||'Sin direccion') + '</p>' +
       '<span class="badge badge-' + badgeClass + '">' + (c.tipo||'') + '</span>' +
+      catTag +
       (c.zona ? '<span style="font-size:0.65em;color:#888;margin-left:4px">' + c.zona + '</span>' : '');
     div.onclick = () => {
       if (markers[c.id]) {
@@ -406,6 +531,80 @@ function renderList(filtered) {
     };
     list.appendChild(div);
   });
+}
+
+// === FILTROS PANEL DERECHO ===
+function onFilterCategoriaChange() {
+  const cat = document.getElementById('filter-categoria').value;
+  const subSel = document.getElementById('filter-subcategoria');
+  const prodSel = document.getElementById('filter-producto');
+  subSel.innerHTML = '<option value="">-- Todas --</option>';
+  prodSel.innerHTML = '<option value="">-- Todos --</option>';
+  if (cat && CATEGORIAS_DATA[cat]) {
+    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
+      const opt = document.createElement('option');
+      opt.value = sub;
+      opt.textContent = sub;
+      subSel.appendChild(opt);
+    });
+  }
+  applyFilters();
+}
+
+function onFilterSubcategoriaChange() {
+  const cat = document.getElementById('filter-categoria').value;
+  const sub = document.getElementById('filter-subcategoria').value;
+  const prodSel = document.getElementById('filter-producto');
+  prodSel.innerHTML = '<option value="">-- Todos --</option>';
+  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
+    CATEGORIAS_DATA[cat][sub].forEach(prod => {
+      const opt = document.createElement('option');
+      opt.value = prod;
+      opt.textContent = prod;
+      prodSel.appendChild(opt);
+    });
+  }
+  applyFilters();
+}
+
+function clearRightFilters() {
+  document.getElementById('filter-categoria').value = '';
+  document.getElementById('filter-subcategoria').innerHTML = '<option value="">-- Todas --</option>';
+  document.getElementById('filter-producto').innerHTML = '<option value="">-- Todos --</option>';
+  document.getElementById('filter-count').textContent = '';
+  applyFilters();
+}
+
+// === FORM - CATEGORIA CHANGE ===
+function onCategoriasChange() {
+  const cat = document.getElementById('input-categoria').value;
+  const subSel = document.getElementById('input-subcategoria');
+  const prodSel = document.getElementById('input-producto');
+  subSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  if (cat && CATEGORIAS_DATA[cat]) {
+    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
+      const opt = document.createElement('option');
+      opt.value = sub;
+      opt.textContent = sub;
+      subSel.appendChild(opt);
+    });
+  }
+}
+
+function onSubcategoriaChange() {
+  const cat = document.getElementById('input-categoria').value;
+  const sub = document.getElementById('input-subcategoria').value;
+  const prodSel = document.getElementById('input-producto');
+  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
+    CATEGORIAS_DATA[cat][sub].forEach(prod => {
+      const opt = document.createElement('option');
+      opt.value = prod;
+      opt.textContent = prod;
+      prodSel.appendChild(opt);
+    });
+  }
 }
 
 function toggleTipo(tipo, el) {
@@ -456,10 +655,17 @@ function toggleZona(zona, el) {
   applyFilters();
 }
 
-function toggleFotosSection() {
+function toggleObraFields() {
   const tipo = document.getElementById('input-tipo').value;
-  const section = document.getElementById('fotos-section');
-  section.style.display = (tipo === 'Obra') ? 'block' : 'none';
+  const obraFields = document.getElementById('obra-fields');
+  const fotosSection = document.getElementById('fotos-section');
+  if (tipo === 'Obra') {
+    obraFields.classList.add('visible');
+    fotosSection.style.display = 'block';
+  } else {
+    obraFields.classList.remove('visible');
+    fotosSection.style.display = 'none';
+  }
 }
 
 function openAddModal() {
@@ -468,11 +674,14 @@ function openAddModal() {
   ['input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('input-tipo').value = 'Distribuidor';
   document.getElementById('input-zona').value = '';
+  document.getElementById('input-categoria').value = '';
+  document.getElementById('input-subcategoria').innerHTML = '<option value="">-- Seleccionar --</option>';
+  document.getElementById('input-producto').innerHTML = '<option value="">-- Seleccionar --</option>';
   fotosNuevas = [];
   fotosExistentes = [];
   fotosEliminadas = [];
   renderFotosPreview();
-  toggleFotosSection();
+  toggleObraFields();
   document.getElementById('modal-overlay').classList.add('active');
 }
 
@@ -490,13 +699,40 @@ function editCliente(id) {
   document.getElementById('input-telefono').value = c.telefono || '';
   document.getElementById('input-email').value = c.email || '';
   document.getElementById('input-notas').value = c.notas || '';
+  // Restore categoria/subcategoria/producto
+  const cat = c.categoria || '';
+  document.getElementById('input-categoria').value = cat;
+  // Rebuild subcategoria options
+  const subSel = document.getElementById('input-subcategoria');
+  subSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  if (cat && CATEGORIAS_DATA[cat]) {
+    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
+      const opt = document.createElement('option');
+      opt.value = sub;
+      opt.textContent = sub;
+      subSel.appendChild(opt);
+    });
+  }
+  subSel.value = c.subcategoria || '';
+  // Rebuild producto options
+  const prodSel = document.getElementById('input-producto');
+  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  const sub = c.subcategoria || '';
+  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
+    CATEGORIAS_DATA[cat][sub].forEach(prod => {
+      const opt = document.createElement('option');
+      opt.value = prod;
+      opt.textContent = prod;
+      prodSel.appendChild(opt);
+    });
+  }
+  prodSel.value = c.producto || '';
   fotosNuevas = [];
   fotosExistentes = [...(c.fotos || [])];
   fotosEliminadas = [];
   renderFotosPreview();
-  toggleFotosSection();
+  toggleObraFields();
   document.getElementById('modal-overlay').classList.add('active');
-  // Close popup if open
   map.closePopup();
 }
 
@@ -515,10 +751,7 @@ async function handleFotosUpload(event) {
     const ext = file.name.split('.').pop();
     const filename = Date.now() + '_' + Math.random().toString(36).substr(2,8) + '.' + ext;
     const { data, error } = await db.storage.from(STORAGE_BUCKET).upload(filename, file, { cacheControl: '3600', upsert: false });
-    if (error) {
-      console.error('Error subiendo foto:', error);
-      continue;
-    }
+    if (error) { console.error('Error subiendo foto:', error); continue; }
     const { data: urlData } = db.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
     fotosNuevas.push(urlData.publicUrl);
   }
@@ -535,17 +768,17 @@ function renderFotosPreview() {
     const isExisting = idx < fotosExistentes.length;
     const div = document.createElement('div');
     div.className = 'foto-thumb';
-const img = document.createElement('img');
-              img.src = url;
-              img.alt = 'foto ' + (idx+1);
-              img.style.cssText = 'width:100%;height:100%;object-fit:cover';
-              const btn = document.createElement('button');
-              btn.className = 'remove-foto';
-              btn.title = 'Eliminar';
-              btn.innerHTML = '&times;';
-              btn.onclick = function(){ removeFoto(idx, url, isExisting); };
-              div.appendChild(img);
-              div.appendChild(btn);
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'foto ' + (idx+1);
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    const btn = document.createElement('button');
+    btn.className = 'remove-foto';
+    btn.title = 'Eliminar';
+    btn.innerHTML = '&times;';
+    btn.onclick = function(){ removeFoto(idx, url, isExisting); };
+    div.appendChild(img);
+    div.appendChild(btn);
     container.appendChild(div);
   });
 }
@@ -568,6 +801,9 @@ async function saveCliente() {
   if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias. Hace clic en el mapa o ingresalas manualmente.'); return; }
   const tipo = document.getElementById('input-tipo').value;
   const todasFotos = (tipo === 'Obra') ? [...fotosExistentes, ...fotosNuevas] : [];
+  const categoria = (tipo === 'Obra') ? document.getElementById('input-categoria').value : null;
+  const subcategoria = (tipo === 'Obra') ? document.getElementById('input-subcategoria').value : null;
+  const producto = (tipo === 'Obra') ? document.getElementById('input-producto').value : null;
   const payload = {
     nombre, tipo,
     zona: document.getElementById('input-zona').value || null,
@@ -576,7 +812,10 @@ async function saveCliente() {
     telefono: document.getElementById('input-telefono').value,
     email: document.getElementById('input-email').value,
     notas: document.getElementById('input-notas').value,
-    fotos: todasFotos
+    fotos: todasFotos,
+    categoria: categoria || null,
+    subcategoria: subcategoria || null,
+    producto: producto || null
   };
   showLoading(true);
   const editId = document.getElementById('edit-id').value;
@@ -649,6 +888,11 @@ function closeLightbox() {
 function showLoading(s) {
   document.getElementById('loading').style.display = s ? 'block' : 'none';
 }
+
+// Bind filter-subcategoria change
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('filter-subcategoria').addEventListener('change', onFilterSubcategoriaChange);
+});
 
 initMap();
 loadClientes();
