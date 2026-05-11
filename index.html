@@ -17,7 +17,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .map-container { flex: 1; position: relative; }
 #map { width: 100%; height: 100%; }
 .right-panel { width: 240px; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 12px; flex-shrink: 0; }
-.right-panel h3 { font-size: 0.75em; color: #444; margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 10px; border-radius: 8px; }
+.right-panel h3 { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; }
 .right-panel .filter-group { margin-bottom: 14px; }
 .right-panel .filter-group label { display: block; font-size: 0.75em; color: #555; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .right-panel select { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.82em; background: white; cursor: pointer; }
@@ -90,7 +90,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .obra-fields { display: none; border: 1px solid #e0c8ff; border-radius: 8px; padding: 10px; background: #f8f0ff; margin-bottom: 12px; }
 .obra-fields.visible { display: block; }
 .obra-fields .obra-fields-title { font-size: 0.75em; color: #6f42c1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-/* === FOTOS STYLES === */
 .fotos-section { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
 .fotos-section label { display: block; font-size: 0.8em; color: #555; margin-bottom: 6px; font-weight: 600; }
 .fotos-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -100,7 +99,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .upload-foto-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #f8f9ff; border: 2px dashed #667eea; border-radius: 7px; color: #667eea; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
 .upload-foto-btn:hover { background: #e8ecff; }
 .upload-progress { font-size: 0.75em; color: #667eea; margin-top: 4px; display: none; }
-/* === GALERIA FOTOS MODAL === */
 #galeria-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20000; align-items: center; justify-content: center; }
 #galeria-modal.active { display: flex; }
 .galeria-container { background: white; border-radius: 14px; padding: 20px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; position: relative; }
@@ -111,7 +109,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .galeria-item img { width: 100%; height: 100%; object-fit: cover; }
 .galeria-empty { text-align: center; color: #999; font-size: 0.9em; padding: 30px; }
 .galeria-close { position: absolute; top: 14px; right: 14px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-/* Lightbox */
 #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 30000; align-items: center; justify-content: center; }
 #lightbox.active { display: flex; }
 #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
@@ -126,9 +123,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 </header>
 <div class="main-container">
 <div class="sidebar">
-<div class="search-box">
-<input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()">
-</div>
+<div class="search-box"><input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()"></div>
 <div class="stats-panel">
 <h3>RESUMEN</h3>
 <div class="stats-grid">
@@ -181,16 +176,17 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 <div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
 </div>
 </div>
-<!-- PANEL DERECHO DE FILTROS -->
+<!-- PANEL DERECHO -->
 <div class="right-panel">
 <h3>&#128269; Filtrar Obras</h3>
 <div class="filter-group">
 <label>Categoria</label>
 <select id="filter-categoria" onchange="onFilterCategoriaChange()">
 <option value="">-- Todas --</option>
+<option value="Revestimientos Interiores">Revestimientos Interiores</option>
 <option value="Control Solar">Control Solar</option>
-<option value="Cielos Rasos">Cielos Rasos</option>
-<option value="Fachadas">Fachadas</option>
+<option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
+<option value="Pisos">Pisos</option>
 </select>
 </div>
 <div class="filter-group">
@@ -211,7 +207,7 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 </div>
 <button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
 <div class="loading" id="loading">Cargando...</div>
-<!-- MODAL AGREGAR/EDITAR CLIENTE -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay">
 <div class="modal">
 <h2 id="modal-title">Agregar Cliente</h2>
@@ -246,16 +242,16 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 </select>
 </div>
 </div>
-<!-- CAMPOS EXTRA PARA OBRA GANADA -->
 <div class="obra-fields" id="obra-fields">
 <div class="obra-fields-title">&#127970; Datos de la Obra</div>
 <div class="form-group">
 <label>Categoria</label>
 <select id="input-categoria" onchange="onCategoriasChange()">
 <option value="">-- Seleccionar --</option>
+<option value="Revestimientos Interiores">Revestimientos Interiores</option>
 <option value="Control Solar">Control Solar</option>
-<option value="Cielos Rasos">Cielos Rasos</option>
-<option value="Fachadas">Fachadas</option>
+<option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
+<option value="Pisos">Pisos</option>
 </select>
 </div>
 <div class="form-group">
@@ -276,34 +272,16 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 <input type="text" id="input-direccion" placeholder="Calle, numero, ciudad">
 </div>
 <div class="form-row">
-<div class="form-group">
-<label>Latitud *</label>
-<input type="number" id="input-lat" placeholder="-34.6037" step="any">
+<div class="form-group"><label>Latitud *</label><input type="number" id="input-lat" placeholder="-34.6037" step="any"></div>
+<div class="form-group"><label>Longitud *</label><input type="number" id="input-lng" placeholder="-58.3816" step="any"></div>
 </div>
-<div class="form-group">
-<label>Longitud *</label>
-<input type="number" id="input-lng" placeholder="-58.3816" step="any">
-</div>
-</div>
-<div class="form-group">
-<label>Telefono</label>
-<input type="text" id="input-telefono" placeholder="+54 11 0000-0000">
-</div>
-<div class="form-group">
-<label>Email</label>
-<input type="email" id="input-email" placeholder="contacto@empresa.com">
-</div>
-<div class="form-group">
-<label>Notas</label>
-<textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea>
-</div>
-<!-- SECCION FOTOS (solo para Obras ganadas) -->
+<div class="form-group"><label>Telefono</label><input type="text" id="input-telefono" placeholder="+54 11 0000-0000"></div>
+<div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="contacto@empresa.com"></div>
+<div class="form-group"><label>Notas</label><textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea></div>
 <div class="fotos-section" id="fotos-section" style="display:none">
 <label>Fotos de la Obra</label>
 <div class="fotos-preview" id="fotos-preview"></div>
-<label class="upload-foto-btn" for="input-fotos-file">
-<span>&#128247;</span> Agregar fotos
-</label>
+<label class="upload-foto-btn" for="input-fotos-file"><span>&#128247;</span> Agregar fotos</label>
 <input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
 <div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
 </div>
@@ -312,8 +290,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
 </div>
 </div>
-
-<!-- MODAL GALERIA DE FOTOS -->
 <div id="galeria-modal">
 <div class="galeria-container">
 <button class="galeria-close" onclick="closeGaleria()">&times;</button>
@@ -321,8 +297,6 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 <div class="galeria-grid" id="galeria-grid"></div>
 </div>
 </div>
-
-<!-- LIGHTBOX -->
 <div id="lightbox">
 <button class="lb-close" onclick="closeLightbox()">&times;</button>
 <img id="lightbox-img" src="" alt="Foto obra">
@@ -335,59 +309,76 @@ const STORAGE_BUCKET = 'obras-fotos';
 let map, markers = {}, allClientes = [];
 let tiposActivos = new Set(['todos']);
 let zonasActivas = new Set(['ninguna']);
-let fotosNuevas = [];
-let fotosExistentes = [];
-let fotosEliminadas = [];
+let fotosNuevas = [], fotosExistentes = [], fotosEliminadas = [];
 
-// Datos de Categoria / Sub-Categoria / Producto
 const CATEGORIAS_DATA = {
+  "Revestimientos Interiores": {
+    "Cielos Lineales y Modulares Metalicos": [
+      "Tile Lay-On MetalScreen","Tile Lay-in","Tile Snap-in",
+      "Plank Snap-in","Plank Hook-on","Plank HooK-On MetalScreen",
+      "Plank Hook-On XL","Bafle","Cielos U",
+      "30B - 80B - 130B - 180B","Cielos Metalicos - 100v - 200v",
+      "300L Grid","300L","5c - 150c","Timberline","Piramid",
+      "Tubrise","Tubrise Horizontal","84R","Multicell","Cell t-15",
+      "Perfil Sistema 125","Ungrid","Cell - Minicell","Edgeline",
+      "Sistemas Sismicos Cielos"
+    ],
+    "Revestimiento Muro Interior": [
+      "Lunawood","Woodlines","Parklex Prodema","MetalScreen",
+      "Geoclad","Mallas GKD","Screenpanel","Miniwave",
+      "Quadrolines 15x10 / 30x15"
+    ]
+  },
   "Control Solar": {
     "Cortasoles de Madera": ["Woodbrise"],
-    "Cortasoles Accionables": ["Persiana Exterior de Aluminio 80MM","Fins","MetalBrise","Aeroscreen Plus","Windscreen","Aerowing"],
-    "Cortasoles Lineales": ["Fins","NBK","Quadrobrise 32x32","Quadrobrise 25/50 - 25/75 - 40/60 - 40/100","Tubrise","Aerobrise 100 - 200","Celoscreen","Sunlines","30B - 50B -50BD","Celosia C23 - C40","Celosia 70S","H2-SL4","Minitubrise"],
+    "Cortasoles Accionables": [
+      "Persiana Exterior de Aluminio 80MM","Fins","MetalBrise",
+      "Aeroscreen Plus","Windscreen","Aerowing"
+    ],
+    "Cortasoles Lineales": [
+      "Fins","NBK","Quadrobrise 32x32",
+      "Quadrobrise 25/50 - 25/75 - 40/60 - 40/100","Tubrise",
+      "Aerobrise 100 - 200","Celoscreen","Sunlines",
+      "30B - 50B - 50BD","Celosia C23 - C40","Celosia 70S",
+      "H2-SL4","Minitubrise"
+    ],
     "Cortasoles Reticulados": ["Brisolcell","Filigree"],
-    "Paneles Screen": ["ScreenPanel","Stripscreen","Quadrolines 30x15 / 15x10","Mallas GKD","Stripwave"],
+    "Paneles Screen": [
+      "ScreenPanel","Stripscreen","Quadrolines 30x15 / 15x10",
+      "Mallas GKD","Stripwave"
+    ],
     "Folding / Sliding Shutter": ["Folding / Sliding Shutter"]
   },
-  "Cielos Rasos": {
-    "Lineal": ["Lineal C38","Lineal C50","Lineal C84","Lineal C100","Lineal C150","Lineal C200","Lineal C300"],
-    "Bandejas": ["Bandejas Curvada","Bandejas Perforada","Bandejas Lisa"],
-    "Celdas": ["Celdas Cuadrada","Celdas Hexagonal","Celdas Triangular"],
-    "Lamas": ["Lama Curvada","Lama Triangular","Lama Plana"]
-  },
-  "Fachadas": {
+  "Fachadas y Cubiertas": {
     "Cassette": ["Cassette 500","Cassette 1000"],
     "Planchas": ["Planchas Perforadas","Planchas Lisas"],
-    "FUSSION": ["Deck moso Bamboo Xtreme","Deck de Composite","Revestimiento Bamboo","Revestimiento Composite"]
+    "FUSSION": [
+      "Deck moso Bamboo Xtreme","Deck de Composite",
+      "Revestimiento Bamboo","Revestimiento Composite"
+    ],
+    "Cubiertas": ["Cubierta Curva","Cubierta Plana","Cubierta Inclinada"]
+  },
+  "Pisos": {
+    "Pisos de Madera": ["Deck moso Bamboo Xtreme","Deck de Composite"],
+    "Pisos Vinilicos": ["Piso Vinil Plank","Piso Vinil Tile"],
+    "Alfombras": ["Alfombra Modular","Alfombra en Rollo"]
   }
 };
 
 const COLORES = {
-  'Distribuidor': '#28a745',
-  'Obra': '#fd7e14',
-  'Desarrolladora': '#dc3545',
-  'Desarrolladora-ACT': '#17a2b8',
-  'Prospecto': '#ffc107',
-  'Obras': '#1a237e'
+  'Distribuidor':'#28a745','Obra':'#fd7e14','Desarrolladora':'#dc3545',
+  'Desarrolladora-ACT':'#17a2b8','Prospecto':'#ffc107','Obras':'#1a237e'
 };
 
 function colorDot(tipo) {
   const c = COLORES[tipo] || '#6c757d';
-  return L.divIcon({
-    html: '<div style="width:14px;height:14px;background:' + c + ';border:2.5px solid white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.35)"></div>',
-    className: '', iconSize: [14,14], iconAnchor: [7,7]
-  });
+  return L.divIcon({ html: '<div style="width:14px;height:14px;background:'+c+';border:2.5px solid white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.35)"></div>', className:'', iconSize:[14,14], iconAnchor:[7,7] });
 }
 
 function initMap() {
   map = L.map('map', { center: [-38.4161, -63.6167], zoom: 5 });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '(c) OpenStreetMap', maxZoom: 18
-  }).addTo(map);
-  map.on('click', e => {
-    document.getElementById('input-lat').value = e.latlng.lat.toFixed(6);
-    document.getElementById('input-lng').value = e.latlng.lng.toFixed(6);
-  });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '(c) OpenStreetMap', maxZoom: 18 }).addTo(map);
+  map.on('click', e => { document.getElementById('input-lat').value = e.latlng.lat.toFixed(6); document.getElementById('input-lng').value = e.latlng.lng.toFixed(6); });
 }
 
 async function loadClientes() {
@@ -396,13 +387,9 @@ async function loadClientes() {
     const { data, error } = await db.from('clientes').select('*').order('nombre');
     if (error) throw error;
     allClientes = data || [];
-    updateStats();
-    applyFilters();
+    updateStats(); applyFilters();
     document.getElementById('connection-status').textContent = 'Conectado (' + allClientes.length + ')';
-  } catch(e) {
-    document.getElementById('connection-status').textContent = 'Error: ' + e.message;
-    console.error(e);
-  }
+  } catch(e) { document.getElementById('connection-status').textContent = 'Error: ' + e.message; }
   showLoading(false);
 }
 
@@ -417,35 +404,20 @@ function updateStats() {
 
 function getFiltered() {
   const q = document.getElementById('search-input').value.toLowerCase();
-  const filterCat = document.getElementById('filter-categoria').value;
-  const filterSub = document.getElementById('filter-subcategoria').value;
-  const filterProd = document.getElementById('filter-producto').value;
+  const fCat = document.getElementById('filter-categoria').value;
+  const fSub = document.getElementById('filter-subcategoria').value;
+  const fProd = document.getElementById('filter-producto').value;
+  const hasFilter = fCat || fSub || fProd;
   return allClientes.filter(c => {
     const matchTipo = tiposActivos.has('todos') || tiposActivos.has(c.tipo);
     let matchZona = true;
-    if (!zonasActivas.has('ninguna') && zonasActivas.size > 0) {
-      matchZona = c.zona && zonasActivas.has(c.zona);
-    }
+    if (!zonasActivas.has('ninguna') && zonasActivas.size > 0) matchZona = c.zona && zonasActivas.has(c.zona);
     const matchSearch = !q || (c.nombre||'').toLowerCase().includes(q) || (c.direccion||'').toLowerCase().includes(q);
-    // Filter by categoria/subcategoria/producto only applies to Obras
-    let matchCat = true;
-    if (filterCat && c.tipo === 'Obra') {
-      matchCat = c.categoria === filterCat;
-    } else if (filterCat && c.tipo !== 'Obra') {
-      matchCat = false;
-    }
-    let matchSub = true;
-    if (filterSub && c.tipo === 'Obra') {
-      matchSub = c.subcategoria === filterSub;
-    }
-    let matchProd = true;
-    if (filterProd && c.tipo === 'Obra') {
-      matchProd = c.producto === filterProd;
-    }
-    // If any categoria filter is active, only show Obra type
-    const hasFilter = filterCat || filterSub || filterProd;
     if (hasFilter && c.tipo !== 'Obra') return false;
-    return matchTipo && matchZona && matchSearch && matchCat && matchSub && matchProd;
+    if (fCat && c.categoria !== fCat) return false;
+    if (fSub && c.subcategoria !== fSub) return false;
+    if (fProd && c.producto !== fProd) return false;
+    return matchTipo && matchZona && matchSearch;
   });
 }
 
@@ -458,454 +430,257 @@ function applyFilters() {
     const m = L.marker([c.lat, c.lng], { icon: colorDot(c.tipo) });
     const zona = c.zona ? ' | Zona: ' + c.zona : '';
     const fotos = c.fotos || [];
-    const fotosBadge = (c.tipo === 'Obra' && fotos.length > 0)
-      ? '<span style="font-size:0.75em;color:#fd7e14;margin-left:4px">&#128247; ' + fotos.length + ' foto' + (fotos.length>1?'s':'') + '</span>'
-      : '';
-    const fotosBtn = (c.tipo === 'Obra')
-      ? '<button class="btn-popup orange" onclick="verFotos(' + c.id + ')">&#128247; Ver Fotos' + (fotos.length > 0 ? ' (' + fotos.length + ')' : '') + '</button>'
-      : '';
-    const catInfo = (c.tipo === 'Obra' && c.categoria)
-      ? '<p>' + c.categoria + (c.subcategoria ? ' / ' + c.subcategoria : '') + (c.producto ? ' / ' + c.producto : '') + '</p>'
-      : '';
-    m.bindPopup(
-      '<div class="popup-content">' +
-      '<h3>' + (c.nombre||'') + fotosBadge + '</h3>' +
-      '<p>Tipo: <strong>' + (c.tipo||'-') + '</strong>' + zona + '</p>' +
-      catInfo +
-      '<p>' + (c.direccion||'Sin direccion') + '</p>' +
-      (c.telefono ? '<p>Tel: ' + c.telefono + '</p>' : '') +
-      (c.email ? '<p>Email: ' + c.email + '</p>' : '') +
-      (c.notas ? '<p>' + c.notas + '</p>' : '') +
-      fotosBtn +
-      '<button class="btn-popup" onclick="editCliente(' + c.id + ')">Editar</button>' +
-      '<button class="btn-popup red" onclick="deleteCliente(' + c.id + ')">Eliminar</button>' +
-      '</div>'
-    );
-    m.addTo(map);
-    markers[c.id] = m;
+    const fotosBadge = (c.tipo==='Obra' && fotos.length>0) ? '<span style="font-size:0.75em;color:#fd7e14;margin-left:4px">&#128247; '+fotos.length+' foto'+(fotos.length>1?'s':'')+'</span>' : '';
+    const fotosBtn = (c.tipo==='Obra') ? '<button class="btn-popup orange" onclick="verFotos('+c.id+')">&#128247; Ver Fotos'+(fotos.length>0?' ('+fotos.length+')':'')+'</button>' : '';
+    const catInfo = (c.tipo==='Obra' && c.categoria) ? '<p>'+c.categoria+(c.subcategoria?' / '+c.subcategoria:'')+(c.producto?' / '+c.producto:'')+'</p>' : '';
+    m.bindPopup('<div class="popup-content"><h3>'+(c.nombre||'')+fotosBadge+'</h3><p>Tipo: <strong>'+(c.tipo||'-')+'</strong>'+zona+'</p>'+catInfo+'<p>'+(c.direccion||'Sin direccion')+'</p>'+(c.telefono?'<p>Tel: '+c.telefono+'</p>':'')+(c.email?'<p>Email: '+c.email+'</p>':'')+(c.notas?'<p>'+c.notas+'</p>':'')+fotosBtn+'<button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup red" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
+    m.addTo(map); markers[c.id] = m;
   });
-  renderList(filtered);
-  updateFilterCount(filtered.length);
+  renderList(filtered); updateFilterCount(filtered.length);
 }
 
 function updateFilterCount(count) {
-  const filterCat = document.getElementById('filter-categoria').value;
-  const filterSub = document.getElementById('filter-subcategoria').value;
-  const filterProd = document.getElementById('filter-producto').value;
-  const el = document.getElementById('filter-count');
-  if (filterCat || filterSub || filterProd) {
-    el.textContent = count + ' obra(s) encontrada(s)';
-  } else {
-    el.textContent = '';
-  }
+  const fCat = document.getElementById('filter-categoria').value;
+  const fSub = document.getElementById('filter-subcategoria').value;
+  const fProd = document.getElementById('filter-producto').value;
+  document.getElementById('filter-count').textContent = (fCat||fSub||fProd) ? count+' obra(s) encontrada(s)' : '';
 }
 
 function renderList(filtered) {
   const list = document.getElementById('client-list');
-  if (!filtered || filtered.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:#999;font-size:0.8em;padding:10px">Sin resultados</p>';
-    return;
-  }
-  list.innerHTML = '';
+  if (!filtered || filtered.length===0) { list.innerHTML='<p style="text-align:center;color:#999;font-size:0.8em;padding:10px">Sin resultados</p>'; return; }
+  list.innerHTML='';
   filtered.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'client-card';
-    const badgeClass = { Distribuidor:'dist', Obra:'obras', Desarrolladora:'dev', 'Desarrolladora-ACT':'dev-act', Prospecto:'prosp', Obras:'obras-new' }[c.tipo] || 'dist';
-    const fotos = c.fotos || [];
-    const fotosIcon = (c.tipo === 'Obra' && fotos.length > 0)
-      ? '<span class="foto-count-badge">&#128247; ' + fotos.length + '</span>'
-      : '';
-    const catTag = (c.tipo === 'Obra' && c.categoria)
-      ? '<span style="font-size:0.65em;color:#6f42c1;margin-left:4px">' + c.categoria + '</span>'
-      : '';
-    div.innerHTML = '<h5>' + (c.nombre||'') + fotosIcon + '</h5>' +
-      '<p>' + (c.direccion||'Sin direccion') + '</p>' +
-      '<span class="badge badge-' + badgeClass + '">' + (c.tipo||'') + '</span>' +
-      catTag +
-      (c.zona ? '<span style="font-size:0.65em;color:#888;margin-left:4px">' + c.zona + '</span>' : '');
-    div.onclick = () => {
-      if (markers[c.id]) {
-        map.setView([c.lat, c.lng], 14);
-        markers[c.id].openPopup();
-      }
-    };
+    const div = document.createElement('div'); div.className='client-card';
+    const bc = {Distribuidor:'dist',Obra:'obras',Desarrolladora:'dev','Desarrolladora-ACT':'dev-act',Prospecto:'prosp',Obras:'obras-new'}[c.tipo]||'dist';
+    const fotos = c.fotos||[];
+    const fi = (c.tipo==='Obra'&&fotos.length>0)?'<span class="foto-count-badge">&#128247; '+fotos.length+'</span>':'';
+    const ct = (c.tipo==='Obra'&&c.categoria)?'<span style="font-size:0.65em;color:#6f42c1;margin-left:4px">'+c.categoria+'</span>':'';
+    div.innerHTML='<h5>'+(c.nombre||'')+fi+'</h5><p>'+(c.direccion||'Sin direccion')+'</p><span class="badge badge-'+bc+'">'+(c.tipo||'')+'</span>'+ct+(c.zona?'<span style="font-size:0.65em;color:#888;margin-left:4px">'+c.zona+'</span>':'');
+    div.onclick=()=>{ if(markers[c.id]){map.setView([c.lat,c.lng],14);markers[c.id].openPopup();} };
     list.appendChild(div);
   });
 }
 
-// === FILTROS PANEL DERECHO ===
 function onFilterCategoriaChange() {
   const cat = document.getElementById('filter-categoria').value;
-  const subSel = document.getElementById('filter-subcategoria');
-  const prodSel = document.getElementById('filter-producto');
-  subSel.innerHTML = '<option value="">-- Todas --</option>';
-  prodSel.innerHTML = '<option value="">-- Todos --</option>';
-  if (cat && CATEGORIAS_DATA[cat]) {
-    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
-      const opt = document.createElement('option');
-      opt.value = sub;
-      opt.textContent = sub;
-      subSel.appendChild(opt);
-    });
-  }
+  const ss = document.getElementById('filter-subcategoria');
+  const ps = document.getElementById('filter-producto');
+  ss.innerHTML='<option value="">-- Todas --</option>';
+  ps.innerHTML='<option value="">-- Todos --</option>';
+  if (cat && CATEGORIAS_DATA[cat]) Object.keys(CATEGORIAS_DATA[cat]).forEach(s=>{ const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o); });
   applyFilters();
 }
 
 function onFilterSubcategoriaChange() {
   const cat = document.getElementById('filter-categoria').value;
   const sub = document.getElementById('filter-subcategoria').value;
-  const prodSel = document.getElementById('filter-producto');
-  prodSel.innerHTML = '<option value="">-- Todos --</option>';
-  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
-    CATEGORIAS_DATA[cat][sub].forEach(prod => {
-      const opt = document.createElement('option');
-      opt.value = prod;
-      opt.textContent = prod;
-      prodSel.appendChild(opt);
-    });
-  }
+  const ps = document.getElementById('filter-producto');
+  ps.innerHTML='<option value="">-- Todos --</option>';
+  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub])
+    CATEGORIAS_DATA[cat][sub].forEach(p=>{ const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o); });
   applyFilters();
 }
 
 function clearRightFilters() {
-  document.getElementById('filter-categoria').value = '';
-  document.getElementById('filter-subcategoria').innerHTML = '<option value="">-- Todas --</option>';
-  document.getElementById('filter-producto').innerHTML = '<option value="">-- Todos --</option>';
-  document.getElementById('filter-count').textContent = '';
+  document.getElementById('filter-categoria').value='';
+  document.getElementById('filter-subcategoria').innerHTML='<option value="">-- Todas --</option>';
+  document.getElementById('filter-producto').innerHTML='<option value="">-- Todos --</option>';
+  document.getElementById('filter-count').textContent='';
   applyFilters();
 }
 
-// === FORM - CATEGORIA CHANGE ===
 function onCategoriasChange() {
   const cat = document.getElementById('input-categoria').value;
-  const subSel = document.getElementById('input-subcategoria');
-  const prodSel = document.getElementById('input-producto');
-  subSel.innerHTML = '<option value="">-- Seleccionar --</option>';
-  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
-  if (cat && CATEGORIAS_DATA[cat]) {
-    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
-      const opt = document.createElement('option');
-      opt.value = sub;
-      opt.textContent = sub;
-      subSel.appendChild(opt);
-    });
-  }
+  const ss = document.getElementById('input-subcategoria');
+  const ps = document.getElementById('input-producto');
+  ss.innerHTML='<option value="">-- Seleccionar --</option>';
+  ps.innerHTML='<option value="">-- Seleccionar --</option>';
+  if (cat && CATEGORIAS_DATA[cat]) Object.keys(CATEGORIAS_DATA[cat]).forEach(s=>{ const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o); });
 }
 
 function onSubcategoriaChange() {
   const cat = document.getElementById('input-categoria').value;
   const sub = document.getElementById('input-subcategoria').value;
-  const prodSel = document.getElementById('input-producto');
-  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
-  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
-    CATEGORIAS_DATA[cat][sub].forEach(prod => {
-      const opt = document.createElement('option');
-      opt.value = prod;
-      opt.textContent = prod;
-      prodSel.appendChild(opt);
-    });
-  }
+  const ps = document.getElementById('input-producto');
+  ps.innerHTML='<option value="">-- Seleccionar --</option>';
+  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub])
+    CATEGORIAS_DATA[cat][sub].forEach(p=>{ const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o); });
 }
 
 function toggleTipo(tipo, el) {
-  const tags = document.querySelectorAll('#tags-tipo .tag');
-  if (tipo === 'todos') {
-    tiposActivos = new Set(['todos']);
-    tags.forEach(t => t.className = 'tag');
-    el.classList.add('active-todos');
-  } else {
-    tiposActivos.delete('todos');
-    document.querySelector('#tags-tipo [data-tipo="todos"]').className = 'tag';
-    if (tiposActivos.has(tipo)) {
-      tiposActivos.delete(tipo);
-      el.className = 'tag';
-    } else {
-      tiposActivos.add(tipo);
-      const cls = { Distribuidor:'active-dist', Obra:'active-obras', Desarrolladora:'active-dev', 'Desarrolladora-ACT':'active-dev-act', Prospecto:'active-prosp', Obras:'active-obras-new' }[tipo];
-      el.className = 'tag ' + cls;
-    }
-    if (tiposActivos.size === 0) {
-      tiposActivos.add('todos');
-      document.querySelector('#tags-tipo [data-tipo="todos"]').className = 'tag active-todos';
-    }
+  if (tipo==='todos') { tiposActivos=new Set(['todos']); document.querySelectorAll('#tags-tipo .tag').forEach(t=>t.className='tag'); el.classList.add('active-todos'); }
+  else {
+    tiposActivos.delete('todos'); document.querySelector('#tags-tipo [data-tipo="todos"]').className='tag';
+    if (tiposActivos.has(tipo)) { tiposActivos.delete(tipo); el.className='tag'; }
+    else { tiposActivos.add(tipo); const cls={Distribuidor:'active-dist',Obra:'active-obras',Desarrolladora:'active-dev','Desarrolladora-ACT':'active-dev-act',Prospecto:'active-prosp',Obras:'active-obras-new'}[tipo]; el.className='tag '+cls; }
+    if (tiposActivos.size===0) { tiposActivos.add('todos'); document.querySelector('#tags-tipo [data-tipo="todos"]').className='tag active-todos'; }
   }
   applyFilters();
 }
 
 function toggleZona(zona, el) {
-  if (zona === 'ninguna') {
-    zonasActivas = new Set(['ninguna']);
-    document.querySelectorAll('#tags-zona .tag').forEach(t => t.className = 'tag');
-    el.classList.add('active-zona');
-  } else {
-    zonasActivas.delete('ninguna');
-    document.querySelector('#tags-zona [data-zona="ninguna"]').className = 'tag';
-    if (zonasActivas.has(zona)) {
-      zonasActivas.delete(zona);
-      el.className = 'tag';
-    } else {
-      zonasActivas.add(zona);
-      el.className = 'tag active-zona';
-    }
-    if (zonasActivas.size === 0) {
-      zonasActivas.add('ninguna');
-      document.querySelector('#tags-zona [data-zona="ninguna"]').className = 'tag active-zona';
-    }
+  if (zona==='ninguna') { zonasActivas=new Set(['ninguna']); document.querySelectorAll('#tags-zona .tag').forEach(t=>t.className='tag'); el.classList.add('active-zona'); }
+  else {
+    zonasActivas.delete('ninguna'); document.querySelector('#tags-zona [data-zona="ninguna"]').className='tag';
+    if (zonasActivas.has(zona)) { zonasActivas.delete(zona); el.className='tag'; }
+    else { zonasActivas.add(zona); el.className='tag active-zona'; }
+    if (zonasActivas.size===0) { zonasActivas.add('ninguna'); document.querySelector('#tags-zona [data-zona="ninguna"]').className='tag active-zona'; }
   }
   applyFilters();
 }
 
 function toggleObraFields() {
   const tipo = document.getElementById('input-tipo').value;
-  const obraFields = document.getElementById('obra-fields');
-  const fotosSection = document.getElementById('fotos-section');
-  if (tipo === 'Obra') {
-    obraFields.classList.add('visible');
-    fotosSection.style.display = 'block';
-  } else {
-    obraFields.classList.remove('visible');
-    fotosSection.style.display = 'none';
-  }
+  document.getElementById('obra-fields').classList[tipo==='Obra'?'add':'remove']('visible');
+  document.getElementById('fotos-section').style.display = tipo==='Obra'?'block':'none';
 }
 
 function openAddModal() {
-  document.getElementById('modal-title').textContent = 'Agregar Cliente';
-  document.getElementById('edit-id').value = '';
-  ['input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('input-tipo').value = 'Distribuidor';
-  document.getElementById('input-zona').value = '';
-  document.getElementById('input-categoria').value = '';
-  document.getElementById('input-subcategoria').innerHTML = '<option value="">-- Seleccionar --</option>';
-  document.getElementById('input-producto').innerHTML = '<option value="">-- Seleccionar --</option>';
-  fotosNuevas = [];
-  fotosExistentes = [];
-  fotosEliminadas = [];
-  renderFotosPreview();
-  toggleObraFields();
+  document.getElementById('modal-title').textContent='Agregar Cliente';
+  document.getElementById('edit-id').value='';
+  ['input-nombre','input-direccion','input-lat','input-lng','input-telefono','input-email','input-notas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('input-tipo').value='Distribuidor';
+  document.getElementById('input-zona').value='';
+  document.getElementById('input-categoria').value='';
+  document.getElementById('input-subcategoria').innerHTML='<option value="">-- Seleccionar --</option>';
+  document.getElementById('input-producto').innerHTML='<option value="">-- Seleccionar --</option>';
+  fotosNuevas=[]; fotosExistentes=[]; fotosEliminadas=[];
+  renderFotosPreview(); toggleObraFields();
   document.getElementById('modal-overlay').classList.add('active');
 }
 
 function editCliente(id) {
-  const c = allClientes.find(x => x.id === id);
-  if (!c) return;
-  document.getElementById('modal-title').textContent = 'Editar Cliente';
-  document.getElementById('edit-id').value = id;
-  document.getElementById('input-nombre').value = c.nombre || '';
-  document.getElementById('input-tipo').value = c.tipo || 'Distribuidor';
-  document.getElementById('input-zona').value = c.zona || '';
-  document.getElementById('input-direccion').value = c.direccion || '';
-  document.getElementById('input-lat').value = c.lat || '';
-  document.getElementById('input-lng').value = c.lng || '';
-  document.getElementById('input-telefono').value = c.telefono || '';
-  document.getElementById('input-email').value = c.email || '';
-  document.getElementById('input-notas').value = c.notas || '';
-  // Restore categoria/subcategoria/producto
-  const cat = c.categoria || '';
-  document.getElementById('input-categoria').value = cat;
-  // Rebuild subcategoria options
-  const subSel = document.getElementById('input-subcategoria');
-  subSel.innerHTML = '<option value="">-- Seleccionar --</option>';
-  if (cat && CATEGORIAS_DATA[cat]) {
-    Object.keys(CATEGORIAS_DATA[cat]).forEach(sub => {
-      const opt = document.createElement('option');
-      opt.value = sub;
-      opt.textContent = sub;
-      subSel.appendChild(opt);
-    });
-  }
-  subSel.value = c.subcategoria || '';
-  // Rebuild producto options
-  const prodSel = document.getElementById('input-producto');
-  prodSel.innerHTML = '<option value="">-- Seleccionar --</option>';
-  const sub = c.subcategoria || '';
-  if (cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) {
-    CATEGORIAS_DATA[cat][sub].forEach(prod => {
-      const opt = document.createElement('option');
-      opt.value = prod;
-      opt.textContent = prod;
-      prodSel.appendChild(opt);
-    });
-  }
-  prodSel.value = c.producto || '';
-  fotosNuevas = [];
-  fotosExistentes = [...(c.fotos || [])];
-  fotosEliminadas = [];
-  renderFotosPreview();
-  toggleObraFields();
+  const c = allClientes.find(x=>x.id===id); if(!c) return;
+  document.getElementById('modal-title').textContent='Editar Cliente';
+  document.getElementById('edit-id').value=id;
+  document.getElementById('input-nombre').value=c.nombre||'';
+  document.getElementById('input-tipo').value=c.tipo||'Distribuidor';
+  document.getElementById('input-zona').value=c.zona||'';
+  document.getElementById('input-direccion').value=c.direccion||'';
+  document.getElementById('input-lat').value=c.lat||'';
+  document.getElementById('input-lng').value=c.lng||'';
+  document.getElementById('input-telefono').value=c.telefono||'';
+  document.getElementById('input-email').value=c.email||'';
+  document.getElementById('input-notas').value=c.notas||'';
+  const cat=c.categoria||'';
+  document.getElementById('input-categoria').value=cat;
+  const ss=document.getElementById('input-subcategoria');
+  ss.innerHTML='<option value="">-- Seleccionar --</option>';
+  if(cat && CATEGORIAS_DATA[cat]) Object.keys(CATEGORIAS_DATA[cat]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+  ss.value=c.subcategoria||'';
+  const ps=document.getElementById('input-producto');
+  ps.innerHTML='<option value="">-- Seleccionar --</option>';
+  const sub=c.subcategoria||'';
+  if(cat && sub && CATEGORIAS_DATA[cat] && CATEGORIAS_DATA[cat][sub]) CATEGORIAS_DATA[cat][sub].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o);});
+  ps.value=c.producto||'';
+  fotosNuevas=[]; fotosExistentes=[...(c.fotos||[])]; fotosEliminadas=[];
+  renderFotosPreview(); toggleObraFields();
   document.getElementById('modal-overlay').classList.add('active');
   map.closePopup();
 }
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('active');
-}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
 
-// ===== FOTOS LOGIC =====
 async function handleFotosUpload(event) {
-  const files = Array.from(event.target.files);
-  if (!files.length) return;
-  const progress = document.getElementById('upload-progress');
-  progress.style.display = 'block';
-  progress.textContent = 'Subiendo ' + files.length + ' foto(s)...';
-  for (const file of files) {
-    const ext = file.name.split('.').pop();
-    const filename = Date.now() + '_' + Math.random().toString(36).substr(2,8) + '.' + ext;
-    const { data, error } = await db.storage.from(STORAGE_BUCKET).upload(filename, file, { cacheControl: '3600', upsert: false });
-    if (error) { console.error('Error subiendo foto:', error); continue; }
-    const { data: urlData } = db.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
-    fotosNuevas.push(urlData.publicUrl);
+  const files=Array.from(event.target.files); if(!files.length) return;
+  const prog=document.getElementById('upload-progress');
+  prog.style.display='block'; prog.textContent='Subiendo '+files.length+' foto(s)...';
+  for(const file of files) {
+    const ext=file.name.split('.').pop();
+    const fn=Date.now()+'_'+Math.random().toString(36).substr(2,8)+'.'+ext;
+    const {data,error}=await db.storage.from(STORAGE_BUCKET).upload(fn,file,{cacheControl:'3600',upsert:false});
+    if(error){console.error(error);continue;}
+    const {data:u}=db.storage.from(STORAGE_BUCKET).getPublicUrl(fn);
+    fotosNuevas.push(u.publicUrl);
   }
-  progress.style.display = 'none';
-  event.target.value = '';
-  renderFotosPreview();
+  prog.style.display='none'; event.target.value=''; renderFotosPreview();
 }
 
 function renderFotosPreview() {
-  const container = document.getElementById('fotos-preview');
-  const todasFotos = [...fotosExistentes, ...fotosNuevas];
-  container.innerHTML = '';
-  todasFotos.forEach((url, idx) => {
-    const isExisting = idx < fotosExistentes.length;
-    const div = document.createElement('div');
-    div.className = 'foto-thumb';
-    const img = document.createElement('img');
-    img.src = url;
-    img.alt = 'foto ' + (idx+1);
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover';
-    const btn = document.createElement('button');
-    btn.className = 'remove-foto';
-    btn.title = 'Eliminar';
-    btn.innerHTML = '&times;';
-    btn.onclick = function(){ removeFoto(idx, url, isExisting); };
-    div.appendChild(img);
-    div.appendChild(btn);
-    container.appendChild(div);
+  const c=document.getElementById('fotos-preview');
+  const all=[...fotosExistentes,...fotosNuevas];
+  c.innerHTML='';
+  all.forEach((url,idx)=>{
+    const isEx=idx<fotosExistentes.length;
+    const d=document.createElement('div'); d.className='foto-thumb';
+    const img=document.createElement('img'); img.src=url; img.style.cssText='width:100%;height:100%;object-fit:cover';
+    const btn=document.createElement('button'); btn.className='remove-foto'; btn.innerHTML='&times;';
+    btn.onclick=function(){removeFoto(idx,url,isEx);};
+    d.appendChild(img); d.appendChild(btn); c.appendChild(d);
   });
 }
 
-function removeFoto(idx, url, isExisting) {
-  if (isExisting) {
-    fotosExistentes = fotosExistentes.filter(u => u !== url);
-    fotosEliminadas.push(url);
-  } else {
-    fotosNuevas = fotosNuevas.filter(u => u !== url);
-  }
+function removeFoto(idx,url,isEx) {
+  if(isEx){fotosExistentes=fotosExistentes.filter(u=>u!==url);fotosEliminadas.push(url);}
+  else{fotosNuevas=fotosNuevas.filter(u=>u!==url);}
   renderFotosPreview();
 }
 
 async function saveCliente() {
-  const nombre = document.getElementById('input-nombre').value.trim();
-  const lat = parseFloat(document.getElementById('input-lat').value);
-  const lng = parseFloat(document.getElementById('input-lng').value);
-  if (!nombre) { alert('El nombre es obligatorio'); return; }
-  if (isNaN(lat)||isNaN(lng)) { alert('Las coordenadas son obligatorias. Hace clic en el mapa o ingresalas manualmente.'); return; }
-  const tipo = document.getElementById('input-tipo').value;
-  const todasFotos = (tipo === 'Obra') ? [...fotosExistentes, ...fotosNuevas] : [];
-  const categoria = (tipo === 'Obra') ? document.getElementById('input-categoria').value : null;
-  const subcategoria = (tipo === 'Obra') ? document.getElementById('input-subcategoria').value : null;
-  const producto = (tipo === 'Obra') ? document.getElementById('input-producto').value : null;
-  const payload = {
-    nombre, tipo,
-    zona: document.getElementById('input-zona').value || null,
-    direccion: document.getElementById('input-direccion').value,
-    lat, lng,
-    telefono: document.getElementById('input-telefono').value,
-    email: document.getElementById('input-email').value,
-    notas: document.getElementById('input-notas').value,
-    fotos: todasFotos,
-    categoria: categoria || null,
-    subcategoria: subcategoria || null,
-    producto: producto || null
+  const nombre=document.getElementById('input-nombre').value.trim();
+  const lat=parseFloat(document.getElementById('input-lat').value);
+  const lng=parseFloat(document.getElementById('input-lng').value);
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  if(isNaN(lat)||isNaN(lng)){alert('Las coordenadas son obligatorias.');return;}
+  const tipo=document.getElementById('input-tipo').value;
+  const payload={
+    nombre,tipo,
+    zona:document.getElementById('input-zona').value||null,
+    direccion:document.getElementById('input-direccion').value,
+    lat,lng,
+    telefono:document.getElementById('input-telefono').value,
+    email:document.getElementById('input-email').value,
+    notas:document.getElementById('input-notas').value,
+    fotos:(tipo==='Obra')?[...fotosExistentes,...fotosNuevas]:[],
+    categoria:(tipo==='Obra')?(document.getElementById('input-categoria').value||null):null,
+    subcategoria:(tipo==='Obra')?(document.getElementById('input-subcategoria').value||null):null,
+    producto:(tipo==='Obra')?(document.getElementById('input-producto').value||null):null
   };
   showLoading(true);
-  const editId = document.getElementById('edit-id').value;
+  const editId=document.getElementById('edit-id').value;
   try {
-    if (editId) {
-      const { error } = await db.from('clientes').update(payload).eq('id', editId);
-      if (error) throw error;
-    } else {
-      const { error } = await db.from('clientes').insert(payload);
-      if (error) throw error;
-    }
-    closeModal();
-    await loadClientes();
-  } catch(e) {
-    alert('Error al guardar: ' + e.message);
-  }
+    if(editId){const{error}=await db.from('clientes').update(payload).eq('id',editId);if(error)throw error;}
+    else{const{error}=await db.from('clientes').insert(payload);if(error)throw error;}
+    closeModal(); await loadClientes();
+  } catch(e){alert('Error al guardar: '+e.message);}
   showLoading(false);
 }
 
 async function deleteCliente(id) {
-  if (!confirm('Eliminar este cliente?')) return;
+  if(!confirm('Eliminar este cliente?')) return;
   showLoading(true);
-  try {
-    const { error } = await db.from('clientes').delete().eq('id', id);
-    if (error) throw error;
-    await loadClientes();
-  } catch(e) {
-    alert('Error: ' + e.message);
-  }
+  try{const{error}=await db.from('clientes').delete().eq('id',id);if(error)throw error;await loadClientes();}
+  catch(e){alert('Error: '+e.message);}
   showLoading(false);
 }
 
-// ===== GALERIA =====
 function verFotos(id) {
-  const c = allClientes.find(x => x.id === id);
-  if (!c) return;
-  const fotos = c.fotos || [];
-  document.getElementById('galeria-titulo').textContent = 'Fotos: ' + (c.nombre || '');
-  const grid = document.getElementById('galeria-grid');
-  if (fotos.length === 0) {
-    grid.innerHTML = '<div class="galeria-empty">&#128247; No hay fotos para esta obra.<br><br><small>Editala para agregar fotos.</small></div>';
-  } else {
-    grid.innerHTML = '';
-    fotos.forEach((url, i) => {
-      const div = document.createElement('div');
-      div.className = 'galeria-item';
-      div.onclick = () => openLightbox(url);
-      div.innerHTML = '<img src="' + url + '" alt="Foto ' + (i+1) + '" loading="lazy">';
-      grid.appendChild(div);
-    });
-  }
+  const c=allClientes.find(x=>x.id===id); if(!c) return;
+  const fotos=c.fotos||[];
+  document.getElementById('galeria-titulo').textContent='Fotos: '+(c.nombre||'');
+  const grid=document.getElementById('galeria-grid');
+  if(fotos.length===0){grid.innerHTML='<div class="galeria-empty">&#128247; No hay fotos.<br><small>Editala para agregar fotos.</small></div>';}
+  else{grid.innerHTML='';fotos.forEach((url,i)=>{const d=document.createElement('div');d.className='galeria-item';d.onclick=()=>openLightbox(url);d.innerHTML='<img src="'+url+'" loading="lazy">';grid.appendChild(d);});}
   document.getElementById('galeria-modal').classList.add('active');
   map.closePopup();
 }
 
-function closeGaleria() {
-  document.getElementById('galeria-modal').classList.remove('active');
-}
+function closeGaleria(){document.getElementById('galeria-modal').classList.remove('active');}
+function openLightbox(url){document.getElementById('lightbox-img').src=url;document.getElementById('lightbox').classList.add('active');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.getElementById('lightbox-img').src='';}
+function showLoading(s){document.getElementById('loading').style.display=s?'block':'none';}
 
-function openLightbox(url) {
-  document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox').classList.add('active');
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('active');
-  document.getElementById('lightbox-img').src = '';
-}
-
-function showLoading(s) {
-  document.getElementById('loading').style.display = s ? 'block' : 'none';
-}
-
-// Bind filter-subcategoria change
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('filter-subcategoria').addEventListener('change', onFilterSubcategoriaChange);
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('filter-subcategoria').addEventListener('change',onFilterSubcategoriaChange);
 });
 
 initMap();
 loadClientes();
 
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
-document.getElementById('galeria-modal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeGaleria();
-});
-document.getElementById('lightbox').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeLightbox();
-});
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+document.getElementById('galeria-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeGaleria();});
+document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===e.currentTarget)closeLightbox();});
 </script>
 </body>
 </html>
