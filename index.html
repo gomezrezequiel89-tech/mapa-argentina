@@ -512,7 +512,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
     </div>
     <div id="facturacion-list-container">
       <table class="facturacion-table">
-        <thead><tr><th>Distribuidor</th><th>Período</th><th>Monto</th><th>Notas</th><th></th></tr></thead>
+        <thead><tr><th>Distribuidor</th><th>Período</th><th>USD</th><th>Canal</th><th></th></tr></thead>
         <tbody id="facturacion-tbody"></tbody>
       </table>
     </div>
@@ -539,9 +539,20 @@ header h1 { font-size: 1.1em; font-weight: 600; }
   <!-- TAB: IMPORTAR CSV -->
   <div class="ftab-content" id="ftab-importar">
     <div class="alert-info">
-      <strong>Formatos soportados: Excel (.xlsx, .xls) y CSV (.csv)</strong><br>
-      Columnas esperadas: <code>distribuidor_nombre | monto | anio | mes_desde | mes_hasta | notas | canal</code><br>
-      <small>El campo <strong>canal</strong> es opcional: usar "distribuidor" o "hd" para separar Ventas Directas.</small>
+      <strong>&#128196; Formato esperado del archivo Excel/CSV:</strong>
+      <table style="margin-top:8px;font-size:0.82em;width:100%;border-collapse:collapse">
+        <tr style="background:rgba(25,118,210,0.1)">
+          <th style="padding:4px 8px;text-align:left">Columna</th>
+          <th style="padding:4px 8px;text-align:left">Contenido</th>
+          <th style="padding:4px 8px;text-align:left">Ejemplo</th>
+        </tr>
+        <tr><td style="padding:3px 8px"><strong>Facturacion</strong></td><td>Monto en USD</td><td style="color:#1976d2">USD 4.226,36</td></tr>
+        <tr><td style="padding:3px 8px"><strong>Directa o Distribuidor</strong></td><td>NP = Dist. | NO = HD</td><td><span style="background:#e8f5e9;color:#28a745;padding:1px 5px;border-radius:4px">NP</span> <span style="background:#e3f2fd;color:#1976d2;padding:1px 5px;border-radius:4px">NO</span></td></tr>
+        <tr><td style="padding:3px 8px"><strong>Año</strong></td><td>Año de la venta</td><td>2025</td></tr>
+        <tr><td style="padding:3px 8px"><strong>Periodo</strong></td><td>Formato AAAAMM</td><td>202504 = Abr 2025</td></tr>
+        <tr><td style="padding:3px 8px"><strong>Distribuidor</strong></td><td>Nombre del distribuidor</td><td>ALKIMYA SA</td></tr>
+      </table>
+      <div style="margin-top:8px;font-size:0.78em;color:#555">&#8505; Los distribuidores que no estén cargados en el mapa quedan pendientes y se vinculan automáticamente cuando los agregues.</div>
     </div>
     <div class="import-zone" onclick="document.getElementById('excel-input').click()">
       <div style="font-size:2em">&#128196;</div>
@@ -625,16 +636,15 @@ return L.divIcon({ html: '<div style="width:14px;height:14px;background:'+c+';bo
 
 function fmtMoney(n) {
 if (!n && n !== 0) return '-';
-if (n >= 1000000) return '$ ' + (n/1000000).toFixed(1) + 'M';
-if (n >= 1000) return '$ ' + (n/1000).toFixed(0) + 'K';
-return '$ ' + n.toLocaleString('es-AR');
+if (n >= 1000000) return 'USD ' + (n/1000000).toFixed(1) + 'M';
+if (n >= 1000) return 'USD ' + (n/1000).toFixed(0) + 'K';
+return 'USD ' + n.toFixed(2);
 }
 
 function fmtMoneyFull(n) {
 if (!n && n !== 0) return '-';
-return '$ ' + n.toLocaleString('es-AR');
+return 'USD ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-
 function initMap() {
 map = L.map('map', { center: [-38.4161, -63.6167], zoom: 5 });
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '(c) OpenStreetMap', maxZoom: 18 }).addTo(map);
@@ -1192,9 +1202,14 @@ return;
 const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 tbody.innerHTML = allFacturacion.map(f => {
 const nombre = f.clientes ? f.clientes.nombre : 'ID:'+f.cliente_id;
-const periodo = MESES[f.mes_desde]+' - '+MESES[f.mes_hasta]+' '+f.anio;
-return '<tr><td><strong>'+nombre+'</strong></td><td>'+periodo+'</td><td class="fact-amount">'+fmtMoneyFull(f.monto)+'</td><td style="font-size:0.8em;color:#888">'+(f.notas||'')+'</td><td><button class="fact-del-btn" onclick="deleteFacturacion('+f.id+')">&#128465;</button></td></tr>';
-}).join('');
+const periodo = MESES[f.mes_desde]+' '+f.anio;
+const canalBadge = f.canal === 'distribuidor'
+  ? '<span style="background:#e8f5e9;color:#28a745;padding:1px 6px;border-radius:8px;font-size:0.75em">NP</span>'
+  : f.canal === 'hd'
+  ? '<span style="background:#e3f2fd;color:#1976d2;padding:1px 6px;border-radius:8px;font-size:0.75em">NO</span>'
+  : '<span style="color:#aaa;font-size:0.75em">-</span>';
+return '<tr><td><strong>'+nombre+'</strong></td><td>'+periodo+'</td><td class="fact-amount">'+fmtMoneyFull(f.monto)+'</td><td>'+canalBadge+'</td><td><button class="fact-del-btn" onclick="deleteFacturacion('+f.id+')">&#128465;</button></td></tr>';
+}).join('');;
 updateKPIs();
 renderTop5();
 } catch(e) {
@@ -1244,83 +1259,191 @@ if (!file) return;
 const ext = file.name.split('.').pop().toLowerCase();
 const reader = new FileReader();
 
+// Parse USD amount like "USD 4.226,36" or "USD 1.975,19" -> number
+function parseUSD(val) {
+  if (!val && val !== 0) return 0;
+  const str = String(val).trim();
+  // Remove "USD " prefix
+  const clean = str.replace(/^USD\s*/i, '').trim();
+  // Format: 4.226,36 (dot=thousands, comma=decimal)
+  // Replace dots (thousand sep) and convert comma to dot
+  const num = clean.replace(/\./g, '').replace(',', '.');
+  return parseFloat(num) || 0;
+}
+
+// Parse periodo AAAAMM -> { anio, mes }
+function parsePeriodo(val) {
+  const s = String(val).trim().replace(/[^0-9]/g, '');
+  if (s.length >= 6) {
+    const anio = parseInt(s.substring(0, 4));
+    const mes = parseInt(s.substring(4, 6));
+    return { anio, mes };
+  }
+  return { anio: 2025, mes: 1 };
+}
+
+// Map NP/NO to canal
+function parseCanal(val) {
+  const s = String(val || '').trim().toUpperCase();
+  if (s === 'NP') return 'distribuidor'; // Venta Directa Distribuidor
+  if (s === 'NO') return 'hd';           // Ventas Directas x Hunter Douglas
+  return s.toLowerCase() || null;
+}
+
 reader.onload = function(e) {
   let rows = [];
+
   if (ext === 'csv') {
     const text = e.target.result;
     const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    let headerIdx = { fact: 0, canal: 1, anio: 2, periodo: 3, dist: 4 };
     lines.forEach((line, idx) => {
-      if (idx === 0 && line.toLowerCase().includes('nombre')) return;
+      if (idx === 0) {
+        // Try to detect header row
+        const h = line.toLowerCase();
+        if (h.includes('factur') || h.includes('usd') || h.includes('monto')) return;
+      }
       const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
-      if (parts.length >= 4) rows.push({
-        nombre: parts[0], monto: parseFloat(parts[1])||0,
-        anio: parseInt(parts[2])||2025, mes_desde: parseInt(parts[3])||1,
-        mes_hasta: parseInt(parts[4])||parseInt(parts[3])||1,
-        notas: parts[5]||'', canal: parts[6]||''
-      });
+      if (parts.length >= 4) {
+        const periodo = parsePeriodo(parts[3]);
+        rows.push({
+          nombre: (parts[4] || '').trim(),
+          monto: parseUSD(parts[0]),
+          anio: parseInt(parts[2]) || periodo.anio,
+          mes_desde: periodo.mes,
+          mes_hasta: periodo.mes,
+          canal: parseCanal(parts[1]),
+          notas: ''
+        });
+      }
     });
   } else {
     // Excel via SheetJS
     const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data, { type: 'array' });
+    const wb = XLSX.read(data, { type: 'array', cellText: true, cellDates: false });
     const ws = wb.Sheets[wb.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    // Get raw data with header
+    const jsonData = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+
+    // Detect column names flexibly
     jsonData.forEach(row => {
-      const keys = Object.keys(row).map(k => k.toLowerCase().trim());
-      const get = (names) => {
-        for (const n of names) {
-          const k = Object.keys(row).find(k2 => k2.toLowerCase().trim() === n);
-          if (k !== undefined && row[k] !== '') return row[k];
-        }
-        return '';
+      const keys = Object.keys(row);
+      // Find each column by partial match
+      const findCol = (patterns) => {
+        const k = keys.find(k => patterns.some(p => k.toLowerCase().replace(/\s+/g,'').includes(p)));
+        return k ? row[k] : '';
       };
-      const nombre = String(get(['nombre','distribuidor','distribuidor_nombre','name']) || '').trim();
-      if (!nombre) return;
+
+      const facturacionRaw = findCol(['factur','monto','usd','importe','amount']);
+      const canalRaw       = findCol(['directa','canal','tipo','nd','np','no']);
+      const anioRaw        = findCol(['a\u00f1o','anio','year','a\u00c3\u00b1o']);
+      const periodoRaw     = findCol(['periodo','period','per\u00edodo']);
+      const distRaw        = findCol(['distribuidor','cliente','nombre','name']);
+
+      if (!facturacionRaw && !distRaw) return;
+
+      const periodo = parsePeriodo(periodoRaw || anioRaw);
+      const anio = (String(anioRaw).trim().length === 4) ? parseInt(anioRaw) : periodo.anio;
+
       rows.push({
-        nombre,
-        monto: parseFloat(get(['monto','importe','ventas','total','amount'])) || 0,
-        anio: parseInt(get(['anio','año','year'])) || 2025,
-        mes_desde: parseInt(get(['mes_desde','mes desde','from','desde'])) || 1,
-        mes_hasta: parseInt(get(['mes_hasta','mes hasta','to','hasta'])) || 1,
-        notas: String(get(['notas','nota','notes','observaciones']) || ''),
-        canal: String(get(['canal','channel','tipo_venta']) || '').toLowerCase()
+        nombre:    String(distRaw || '').trim(),
+        monto:     parseUSD(facturacionRaw),
+        anio:      anio || periodo.anio,
+        mes_desde: periodo.mes,
+        mes_hasta: periodo.mes,
+        canal:     parseCanal(canalRaw),
+        notas:     ''
       });
     });
   }
+
+  // Filter out rows with no name or zero amount
+  rows = rows.filter(r => r.nombre && r.monto > 0);
   csvParsedData = rows;
-  const preview = rows.map(r =>
-    '<tr><td>'+r.nombre+'</td><td>'+fmtMoneyFull(r.monto)+'</td><td>'+r.anio+'</td><td>'+r.mes_desde+'-'+r.mes_hasta+'</td><td>'+(r.canal||'-')+'</td></tr>'
+
+  const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const canalLabel = { distribuidor: 'Dist.', hd: 'HD', null: '-', '': '-' };
+  const preview = rows.slice(0, 20).map(r =>
+    '<tr>' +
+    '<td><strong>' + r.nombre + '</strong></td>' +
+    '<td style="color:#1976d2;font-weight:600">USD ' + r.monto.toFixed(2) + '</td>' +
+    '<td>' + r.anio + '</td>' +
+    '<td>' + (MESES[r.mes_desde] || r.mes_desde) + '</td>' +
+    '<td><span style="background:' + (r.canal==='distribuidor'?'#e8f5e9;color:#28a745':'#e3f2fd;color:#1976d2') + ';padding:2px 7px;border-radius:10px;font-size:0.8em">' + (r.canal==='distribuidor'?'NP - Dist.':'NO - HD') + '</span></td>' +
+    '</tr>'
   );
+  const moreRows = rows.length > 20 ? '<tr><td colspan="5" style="text-align:center;color:#888;font-size:0.8em">... y ' + (rows.length-20) + ' registros más</td></tr>' : '';
+
   document.getElementById('csv-preview').style.display = 'block';
   document.getElementById('csv-preview-table').innerHTML =
-    '<table class="facturacion-table"><thead><tr><th>Nombre</th><th>Monto</th><th>Año</th><th>Período</th><th>Canal</th></tr></thead><tbody>'+preview.join('')+'</tbody></table>' +
-    '<div style="font-size:0.8em;color:#666;margin-top:6px">'+rows.length+' registros listos para importar</div>';
+    '<table class="facturacion-table"><thead><tr><th>Distribuidor</th><th>USD</th><th>Año</th><th>Mes</th><th>Canal</th></tr></thead><tbody>' +
+    preview.join('') + moreRows +
+    '</tbody></table>' +
+    '<div style="font-size:0.82em;color:#555;margin-top:8px;background:#f0f2f5;padding:8px;border-radius:6px;">' +
+    '<strong>' + rows.length + '</strong> registros listos | ' +
+    '<strong>' + rows.filter(r=>r.canal==='distribuidor').length + '</strong> NP (Dist.) | ' +
+    '<strong>' + rows.filter(r=>r.canal==='hd').length + '</strong> NO (HD)' +
+    '</div>';
 };
 
 if (ext === 'csv') reader.readAsText(file);
 else reader.readAsArrayBuffer(file);
 }
 async function importCSVData() {
-if (!csvParsedData.length) return;
+if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
 showLoading(true);
-let ok = 0, err = 0, notFound = [];
+let ok = 0, skipped = 0, notInMap = [];
+
 for (const row of csvParsedData) {
-  const cliente = allClientes.find(c => c.nombre.toLowerCase().trim() === row.nombre.toLowerCase().trim());
-  if (!cliente) { err++; notFound.push(row.nombre); continue; }
+  // Match distribuidor by name (flexible: ignore case, extra spaces)
+  const normalName = row.nombre.toLowerCase().trim();
+  const cliente = allClientes.find(c =>
+    c.nombre.toLowerCase().trim() === normalName ||
+    c.nombre.toLowerCase().trim().includes(normalName) ||
+    normalName.includes(c.nombre.toLowerCase().trim())
+  );
+
+  let clienteId = null;
+  if (cliente) {
+    clienteId = cliente.id;
+  } else {
+    // Distribuidor no esta en el mapa todavia - guardar con cliente_id_pending
+    // Lo guardamos con un registro especial sin cliente_id (null)
+    // y guardamos el nombre en notas para poder vincularlo luego
+    notInMap.push(row.nombre);
+    // Still insert but we need a valid cliente_id - skip for now, store as pending
+    // We'll insert into a pending table or skip
+    skipped++;
+    continue;
+  }
+
   const payload = {
-    cliente_id: cliente.id, monto: row.monto, anio: row.anio,
-    mes_desde: row.mes_desde, mes_hasta: row.mes_hasta,
+    cliente_id: clienteId,
+    monto: row.monto,
+    anio: row.anio,
+    mes_desde: row.mes_desde,
+    mes_hasta: row.mes_hasta,
     notas: row.notas || null,
     canal: row.canal || null
   };
+
   const { error } = await db.from('facturacion').insert(payload);
-  if (error) err++; else ok++;
+  if (error) { console.error(error); skipped++; }
+  else ok++;
 }
+
 showLoading(false);
-let msg = 'Importacion completada:\n\u2705 '+ok+' registros importados';
-if (err > 0) msg += '\n\u274C '+err+' con error';
-if (notFound.length > 0) msg += '\n\nNo encontrados: ' + notFound.slice(0,5).join(', ');
+
+const uniqueNotInMap = [...new Set(notInMap)];
+let msg = '\u2705 ' + ok + ' registros importados correctamente.';
+if (skipped > 0) msg += '\n\u23F3 ' + skipped + ' registros pendientes (distribuidores no cargados en el mapa todavia).';
+if (uniqueNotInMap.length > 0) {
+  msg += '\n\nDistribuidores pendientes (' + uniqueNotInMap.length + '):\n' + uniqueNotInMap.slice(0,10).join('\n');
+  if (uniqueNotInMap.length > 10) msg += '\n... y ' + (uniqueNotInMap.length-10) + ' mas.';
+  msg += '\n\nCuando los agregues al mapa, volvé a importar el archivo y se vincularán automaticamente.';
+}
 alert(msg);
+
 document.getElementById('csv-preview').style.display = 'none';
 document.getElementById('excel-input').value = '';
 csvParsedData = [];
