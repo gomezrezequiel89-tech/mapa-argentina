@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3h/package/dist/xlsx.full.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; background: #f0f2f5; }
@@ -365,9 +365,11 @@ header h1 { font-size: 1.1em; font-weight: 600; }
   </div>
   <!-- TOP 5 -->
   <div class="top5-section">
-    <h4>&#127941; Top 5 Distribuidores <span style="font-weight:400;color:#aaa;font-size:0.85em">Por ventas</span></h4>
-    <div id="top5-list"></div>
-    <span class="top5-link" onclick="openFacturacionModal()">Ver ranking completo</span>
+<h4 style="display:flex;align-items:center;justify-content:space-between;">&#127941; Top 5 Distribuidores <span style="font-weight:400;color:#aaa;font-size:0.85em">Por ventas</span> <button onclick="toggleVentasSection()" id="btn-top5-eye" title="Mostrar/ocultar top distribuidores" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;">&#128065;&#65039;</button></h4>
+<div id="top5-body">
+<div id="top5-list"></div>
+<span class="top5-link" onclick="openFacturacionModal()">Ver ranking completo</span>
+</div>
   </div>
 </div>
 </div>
@@ -1419,11 +1421,15 @@ function toggleKpiBar() {
 // ===== TOGGLE VENTAS SECTION =====
 let ventasSectionVisible = true;
 function toggleVentasSection() {
-  ventasSectionVisible = !ventasSectionVisible;
-  const body = document.getElementById('ventas-body');
-  const btn = document.getElementById('btn-ventas-eye');
-  if (body) body.style.display = ventasSectionVisible ? '' : 'none';
-  if (btn) btn.textContent = ventasSectionVisible ? '\u{1F441}\uFE0F' : '\u{1F648}';
+ventasSectionVisible = !ventasSectionVisible;
+const body = document.getElementById('ventas-body');
+const btn = document.getElementById('btn-ventas-eye');
+const top5Body = document.getElementById('top5-body');
+const btnTop5 = document.getElementById('btn-top5-eye');
+if (body) body.style.display = ventasSectionVisible ? '' : 'none';
+if (top5Body) top5Body.style.display = ventasSectionVisible ? '' : 'none';
+if (btn) btn.textContent = ventasSectionVisible ? '\u{1F441}\uFE0F' : '\u{1F648}';
+if (btnTop5) btnTop5.textContent = ventasSectionVisible ? '\u{1F441}\uFE0F' : '\u{1F648}';
 }
 
 initMap();
