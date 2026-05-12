@@ -1254,141 +1254,81 @@ return '<tr><td>'+medal+'</td><td><strong>'+d.nombre+'</strong></td><td class="f
 }
 
 function handleFileImport(event) {
-const file = event.target.files[0];
-if (!file) return;
-const ext = file.name.split('.').pop().toLowerCase();
-const reader = new FileReader();
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
 
-// Parse USD amount like "USD 4.226,36" or "USD 1.975,19" -> number
-function parseUSD(val) {
-  if (!val && val !== 0) return 0;
-  const str = String(val).trim();
-  // Remove "USD " prefix
-  const clean = str.replace(/^USD\s*/i, '').trim();
-  // Format: 4.226,36 (dot=thousands, comma=decimal)
-  // Replace dots (thousand sep) and convert comma to dot
-  const num = clean.replace(/\./g, '').replace(',', '.');
-  return parseFloat(num) || 0;
-}
-
-// Parse periodo AAAAMM -> { anio, mes }
-function parsePeriodo(val) {
-  const s = String(val).trim().replace(/[^0-9]/g, '');
-  if (s.length >= 6) {
-    const anio = parseInt(s.substring(0, 4));
-    const mes = parseInt(s.substring(4, 6));
-    return { anio, mes };
+  function parseUSD(val) {
+    if (!val && val !== 0) return 0;
+    const str = String(val).trim();
+    const clean = str.replace(/^USD\s*/i, '').trim();
+    const num = clean.replace(/\./g, '').replace(',', '.');
+    return parseFloat(num) || 0;
   }
-  return { anio: 2025, mes: 1 };
-}
 
-// Map NP/NO to canal
-function parseCanal(val) {
-  const s = String(val || '').trim().toUpperCase();
-  if (s === 'NP') return 'distribuidor'; // Venta Directa Distribuidor
-  if (s === 'NO') return 'hd';           // Ventas Directas x Hunter Douglas
-  return s.toLowerCase() || null;
-}
+  function parsePeriodo(val) {
+    const s = String(val).trim().replace(/[^0-9]/g, '');
+    if (s.length >= 6) {
+      const anio = parseInt(s.substring(0, 4));
+      const mes = parseInt(s.substring(4, 6));
+      return { anio, mes };
+    }
+    return { anio: 2025, mes: 1 };
+  }
 
-reader.onload = function(e) {
-  let rows = [];
+  function parseCanal(val) {
+    const s = String(val || '').trim().toUpperCase();
+    if (s.startsWith('NP')) return 'distribuidor';
+    if (s.startsWith('NO')) return 'hd';
+    return null;
+  }
 
-  if (ext === 'csv') {
-    const text = e.target.result;
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-    let headerIdx = { fact: 0, canal: 1, anio: 2, periodo: 3, dist: 4 };
-    lines.forEach((line, idx) => {
-      if (idx === 0) {
-        // Try to detect header row
-        const h = line.toLowerCase();
-        if (h.includes('factur') || h.includes('usd') || h.includes('monto')) return;
-      }
-      const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
-      if (parts.length >= 4) {
-        const periodo = parsePeriodo(parts[3]);
-        rows.push({
-          nombre: (parts[4] || '').trim(),
-          monto: parseUSD(parts[0]),
-          anio: parseInt(parts[2]) || periodo.anio,
-          mes_desde: periodo.mes,
-          mes_hasta: periodo.mes,
-          canal: parseCanal(parts[1]),
-          notas: ''
-        });
-      }
-    });
-  } else {
-    // Excel via SheetJS
+  reader.onload = function(e) {
+    let rows = [];
     const data = new Uint8Array(e.target.result);
     const wb = XLSX.read(data, { type: 'array', cellText: true, cellDates: false });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    // Get raw data with header
-    const jsonData = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
-
-    // Detect column names flexibly
-    jsonData.forEach(row => {
-      const keys = Object.keys(row);
-      // Find each column by partial match
-      const findCol = (patterns) => {
-        const k = keys.find(k => patterns.some(p => k.toLowerCase().replace(/\s+/g,'').includes(p)));
-        return k ? row[k] : '';
-      };
-
-      const facturacionRaw = findCol(['factur','monto','usd','importe','amount']);
-      const canalRaw       = findCol(['directa','canal','tipo','nd','np','no']);
-      const anioRaw        = findCol(['a\u00f1o','anio','year','a\u00c3\u00b1o']);
-      const periodoRaw     = findCol(['periodo','period','per\u00edodo']);
-      const distRaw        = findCol(['distribuidor','cliente','nombre','name']);
-
-      if (!facturacionRaw && !distRaw) return;
-
-      const periodo = parsePeriodo(periodoRaw || anioRaw);
+    const sheetName = wb.SheetNames.find(n => n.toLowerCase() === 'filtrado') || wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    const aoaData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    for (let i = 1; i < aoaData.length; i++) {
+      const row = aoaData[i];
+      const facturacionRaw = row[0];
+      const proyectoIdRaw  = row[1];
+      const anioRaw        = row[2];
+      const periodoRaw     = row[3];
+      const distribuidorRaw = row[4];
+      const nombre = String(distribuidorRaw || '').trim();
+      if (!nombre) continue;
+      const monto = parseUSD(facturacionRaw);
+      if (!monto || monto <= 0) continue;
+      const periodo = parsePeriodo(periodoRaw);
       const anio = (String(anioRaw).trim().length === 4) ? parseInt(anioRaw) : periodo.anio;
-
-      rows.push({
-        nombre:    String(distRaw || '').trim(),
-        monto:     parseUSD(facturacionRaw),
-        anio:      anio || periodo.anio,
-        mes_desde: periodo.mes,
-        mes_hasta: periodo.mes,
-        canal:     parseCanal(canalRaw),
-        notas:     ''
-      });
-    });
-  }
-
-  // Filter out rows with no name or zero amount
-  rows = rows.filter(r => r.nombre && r.monto > 0);
-  csvParsedData = rows;
-
-  const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const canalLabel = { distribuidor: 'Dist.', hd: 'HD', null: '-', '': '-' };
-  const preview = rows.slice(0, 20).map(r =>
-    '<tr>' +
-    '<td><strong>' + r.nombre + '</strong></td>' +
-    '<td style="color:#1976d2;font-weight:600">USD ' + r.monto.toFixed(2) + '</td>' +
-    '<td>' + r.anio + '</td>' +
-    '<td>' + (MESES[r.mes_desde] || r.mes_desde) + '</td>' +
-    '<td><span style="background:' + (r.canal==='distribuidor'?'#e8f5e9;color:#28a745':'#e3f2fd;color:#1976d2') + ';padding:2px 7px;border-radius:10px;font-size:0.8em">' + (r.canal==='distribuidor'?'NP - Dist.':'NO - HD') + '</span></td>' +
-    '</tr>'
-  );
-  const moreRows = rows.length > 20 ? '<tr><td colspan="5" style="text-align:center;color:#888;font-size:0.8em">... y ' + (rows.length-20) + ' registros más</td></tr>' : '';
-
-  document.getElementById('csv-preview').style.display = 'block';
-  document.getElementById('csv-preview-table').innerHTML =
-    '<table class="facturacion-table"><thead><tr><th>Distribuidor</th><th>USD</th><th>Año</th><th>Mes</th><th>Canal</th></tr></thead><tbody>' +
-    preview.join('') + moreRows +
-    '</tbody></table>' +
-    '<div style="font-size:0.82em;color:#555;margin-top:8px;background:#f0f2f5;padding:8px;border-radius:6px;">' +
-    '<strong>' + rows.length + '</strong> registros listos | ' +
-    '<strong>' + rows.filter(r=>r.canal==='distribuidor').length + '</strong> NP (Dist.) | ' +
-    '<strong>' + rows.filter(r=>r.canal==='hd').length + '</strong> NO (HD)' +
-    '</div>';
-};
-
-if (ext === 'csv') reader.readAsText(file);
-else reader.readAsArrayBuffer(file);
+      const canal = parseCanal(proyectoIdRaw);
+      rows.push({ nombre, monto, anio: anio || periodo.anio, mes_desde: periodo.mes, mes_hasta: periodo.mes, canal, notas: '' });
+    }
+    csvParsedData = rows;
+    const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const preview = rows.slice(0, 20).map(r =>
+      '<tr><td><strong>' + r.nombre + '</strong></td>' +
+      '<td style="color:#1976d2;font-weight:600">USD ' + r.monto.toFixed(2) + '</td>' +
+      '<td>' + r.anio + '</td><td>' + (MESES[r.mes_desde] || r.mes_desde) + '</td>' +
+      '<td><span style="background:' + (r.canal==='distribuidor'?'#e8f5e9;color:#28a745':'#e3f2fd;color:#1976d2') + ';padding:2px 7px;border-radius:10px;font-size:0.8em">' +
+      (r.canal==='distribuidor'?'NP - Dist.':'NO - HD') + '</span></td></tr>'
+    );
+    const moreRows = rows.length > 20 ? '<tr><td colspan="5" style="text-align:center;color:#888;font-size:0.8em">... y ' + (rows.length-20) + ' registros m\u00e1s</td></tr>' : '';
+    document.getElementById('csv-preview').style.display = 'block';
+    document.getElementById('csv-preview-table').innerHTML =
+      '<table class="facturacion-table"><thead><tr><th>Distribuidor</th><th>USD</th><th>A\u00f1o</th><th>Mes</th><th>Canal</th></tr></thead><tbody>' +
+      preview.join('') + moreRows + '</tbody></table>' +
+      '<div style="font-size:0.82em;color:#555;margin-top:8px;background:#f0f2f5;padding:8px;border-radius:6px;">' +
+      '<strong>' + rows.length + '</strong> registros listos | ' +
+      '<strong>' + rows.filter(r=>r.canal==='distribuidor').length + '</strong> NP (Dist.) | ' +
+      '<strong>' + rows.filter(r=>r.canal==='hd').length + '</strong> NO (HD)</div>';
+  };
+  reader.readAsArrayBuffer(file);
 }
+
 async function importCSVData() {
 if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
 showLoading(true);
