@@ -31,6 +31,9 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 .kpi-change { font-size: 0.68em; color: #28a745; white-space: nowrap; }
 .kpi-change.neg { color: #dc3545; }
 .kpi-change.neutral { color: #888; }
+.kpi-bar.hidden { display: none; }
+.btn-kpi-toggle { position: fixed; top: 56px; right: 12px; z-index: 2000; background: rgba(255,255,255,0.95); border: 1px solid #ddd; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s; }
+.btn-kpi-toggle:hover { background: #667eea; color: white; }
 .kpi-link { font-size: 0.68em; color: #667eea; cursor: pointer; white-space: nowrap; }
 .kpi-link:hover { text-decoration: underline; }
 .app-body { display: flex; height: calc(100vh - 56px - 72px); }
@@ -176,7 +179,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 .alert-info { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #1565c0; margin-bottom: 12px; }
 .alert-success { background: #e8f5e9; border-left: 4px solid #28a745; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #155724; margin-bottom: 12px; display: none; }
 /* Sales bubble markers */
-.sales-label { background: rgba(20,120,50,0.92); border: 2px solid rgba(255,255,255,0.6); border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 700; color: #ffffff; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.45); text-shadow: 0 1px 2px rgba(0,0,0,0.5); letter-spacing: 0.3px; }
+.sales-label { display: inline-block; background: rgba(20,120,50,0.92); border: 2px solid rgba(255,255,255,0.6); border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 700; color: #ffffff; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.45); text-shadow: 0 1px 2px rgba(0,0,0,0.5); letter-spacing: 0.3px; }
 </style>
 </head>
 <body>
@@ -205,6 +208,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 </header>
 
 <!-- KPI BAR -->
+<button class="btn-kpi-toggle" id="btn-kpi-toggle" onclick="toggleKpiBar()" title="Mostrar/ocultar indicadores">👁️</button>
 <div class="kpi-bar" id="kpi-bar">
   <div class="kpi-card">
     <div class="kpi-icon green">$</div>
@@ -342,7 +346,8 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 
   <!-- VENTAS SECTION -->
   <div class="ventas-section">
-    <h4>&#128200; Ventas</h4>
+    <h4 style="display:flex;align-items:center;justify-content:space-between;">&#128200; Ventas <button onclick="toggleVentasSection()" id="btn-ventas-eye" title="Mostrar/ocultar ventas" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;">&#128065;&#65039;</button></h4>
+    <div id="ventas-body">
     <select id="ventas-periodo-select" onchange="onVentasPeriodoChange()" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.78em;margin-bottom:6px">
       <option value="1-4">Ene - Abr 2025</option>
       <option value="1-6">Ene - Jun 2025</option>
@@ -357,6 +362,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
     <button onclick="toggleSalesLabels()" id="btn-toggle-sales" style="width:100%;padding:5px;background:#e8f5e9;color:#28a745;border:1px solid #c3e6cb;border-radius:7px;cursor:pointer;font-size:0.75em;margin-top:4px">&#128200; Mostrar ventas en mapa</button>
   </div>
 
+  </div>
   <!-- TOP 5 -->
   <div class="top5-section">
     <h4>&#127941; Top 5 Distribuidores <span style="font-weight:400;color:#aaa;font-size:0.85em">Por ventas</span></h4>
@@ -1394,6 +1400,31 @@ loadFacturacionList();
 document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('filter-subcategoria').addEventListener('change', onFilterSubcategoriaChange);
 });
+
+
+// ===== TOGGLE KPI BAR =====
+let kpiBarVisible = true;
+function toggleKpiBar() {
+  kpiBarVisible = !kpiBarVisible;
+  const bar = document.getElementById('kpi-bar');
+  const btn = document.getElementById('btn-kpi-toggle');
+  if (bar) bar.style.display = kpiBarVisible ? '' : 'none';
+  if (btn) btn.style.background = kpiBarVisible ? 'rgba(255,255,255,0.95)' : '#667eea';
+  if (btn) btn.style.color = kpiBarVisible ? '' : 'white';
+  // Adjust app-body height
+  const body = document.querySelector('.app-body');
+  if (body) body.style.height = kpiBarVisible ? '' : 'calc(100vh - 56px)';
+}
+
+// ===== TOGGLE VENTAS SECTION =====
+let ventasSectionVisible = true;
+function toggleVentasSection() {
+  ventasSectionVisible = !ventasSectionVisible;
+  const body = document.getElementById('ventas-body');
+  const btn = document.getElementById('btn-ventas-eye');
+  if (body) body.style.display = ventasSectionVisible ? '' : 'none';
+  if (btn) btn.textContent = ventasSectionVisible ? '\u{1F441}\uFE0F' : '\u{1F648}';
+}
 
 initMap();
 loadClientes().then(() => loadFacturacion());
