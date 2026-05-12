@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; background: #f0f2f5; }
@@ -222,14 +223,6 @@ header h1 { font-size: 1.1em; font-weight: 600; }
     </div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-icon purple">&#127991;</div>
-    <div class="kpi-info">
-      <div class="kpi-label">Ticket Promedio</div>
-      <div class="kpi-value" id="kpi-ticket">$ 0</div>
-      <div class="kpi-change" id="kpi-ticket-change">--</div>
-    </div>
-  </div>
-  <div class="kpi-card">
     <div class="kpi-icon orange">&#127942;</div>
     <div class="kpi-info">
       <div class="kpi-label">Obras Ganadas</div>
@@ -238,15 +231,22 @@ header h1 { font-size: 1.1em; font-weight: 600; }
     </div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-icon teal">&#128230;</div>
+    <div class="kpi-icon purple">&#128176;</div>
     <div class="kpi-info">
-      <div class="kpi-label">Productos Más Vendidos</div>
-      <div class="kpi-value" id="kpi-productos">0</div>
+      <div class="kpi-label">Venta Directa Distribuidor</div>
+      <div class="kpi-value" id="kpi-venta-directa-dist">$ 0</div>
+      <div class="kpi-change" id="kpi-venta-directa-dist-change">--</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon teal">&#127968;</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Ventas Directas x Hunter Douglas</div>
+      <div class="kpi-value" id="kpi-ventas-hd">$ 0</div>
       <div class="kpi-link" onclick="openFacturacionModal()">Ver ranking</div>
     </div>
   </div>
 </div>
-
 <div class="app-body">
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -490,7 +490,16 @@ header h1 { font-size: 1.1em; font-weight: 600; }
         </select>
       </div>
     </div>
-    <div class="form-group"><label>Notas (opcional)</label><input type="text" id="fact-notas" placeholder="Observaciones adicionales..."></div>
+    <div class="form-row">
+      <div class="form-group"><label>Notas (opcional)</label><input type="text" id="fact-notas" placeholder="Observaciones adicionales..."></div>
+      <div class="form-group"><label>Canal de Venta</label>
+        <select id="fact-canal">
+          <option value="">-- Sin especificar --</option>
+          <option value="distribuidor">Venta Directa Distribuidor</option>
+          <option value="hd">Venta Directa Hunter Douglas</option>
+        </select>
+      </div>
+    </div></div>
     <div class="alert-success" id="fact-success">&#10003; Registro guardado correctamente!</div>
     <button class="btn-success" onclick="saveFacturacion()">&#128190; Guardar Registro</button>
   </div>
@@ -530,22 +539,23 @@ header h1 { font-size: 1.1em; font-weight: 600; }
   <!-- TAB: IMPORTAR CSV -->
   <div class="ftab-content" id="ftab-importar">
     <div class="alert-info">
-      <strong>Formato CSV esperado:</strong><br>
-      distribuidor_nombre, monto, anio, mes_desde, mes_hasta, notas<br>
-      <small>Ejemplo: "Prodarq AP", 1250000, 2025, 1, 4, ""</small>
+      <strong>Formatos soportados: Excel (.xlsx, .xls) y CSV (.csv)</strong><br>
+      Columnas esperadas: <code>distribuidor_nombre | monto | anio | mes_desde | mes_hasta | notas | canal</code><br>
+      <small>El campo <strong>canal</strong> es opcional: usar "distribuidor" o "hd" para separar Ventas Directas.</small>
     </div>
-    <div class="import-zone" onclick="document.getElementById('csv-input').click()">
+    <div class="import-zone" onclick="document.getElementById('excel-input').click()">
       <div style="font-size:2em">&#128196;</div>
-      <p>Hacer clic para seleccionar un archivo CSV</p>
-      <p style="font-size:0.75em;color:#888">O arrastrar y soltar aquí</p>
+      <p><strong>Hacer clic para seleccionar archivo</strong></p>
+      <p style="font-size:0.75em;color:#888">Excel (.xlsx / .xls) o CSV (.csv)</p>
     </div>
-    <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleCSVImport(event)">
+    <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileImport(event)">
     <div id="csv-preview" style="display:none">
-      <div style="font-size:0.82em;margin-bottom:8px;color:#555">Vista previa del CSV:</div>
+      <div style="font-size:0.82em;margin-bottom:8px;color:#555">Vista previa:</div>
       <div id="csv-preview-table"></div>
       <button class="btn-success" onclick="importCSVData()" style="margin-top:10px">&#128190; Importar Datos</button>
     </div>
   </div>
+</div>
 </div>
 </div>
 
@@ -690,23 +700,36 @@ function updateKPIs() {
 const anio = getSelectedAnio();
 const { desde, hasta } = getSelectedPeriodo();
 const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor');
+const obrasGanadas = allClientes.filter(c => c.tipo === 'Obra').length;
+
+// Ventas Totales = suma de todos los registros del período
 let totalVentas = 0;
 let distConVentas = 0;
 distribuidores.forEach(d => {
-const v = getFacturadoForCliente(d.id, anio, desde, hasta);
-if (v > 0) { totalVentas += v; distConVentas++; }
+  const v = getFacturadoForCliente(d.id, anio, desde, hasta);
+  if (v > 0) { totalVentas += v; distConVentas++; }
 });
-const obrasGanadas = allClientes.filter(c => c.tipo === 'Obra').length;
-const ticketProm = distConVentas > 0 ? Math.round(totalVentas / distConVentas) : 0;
-const productosCount = new Set(allFacturacion.filter(f => f.producto).map(f => f.producto)).size;
+
+// Venta Directa Distribuidor = registros tipo 'distribuidor' (canal dist)
+const ventaDirectaDist = allFacturacion
+  .filter(f => f.anio === anio && f.mes_desde <= hasta && f.mes_hasta >= desde && f.canal === 'distribuidor')
+  .reduce((s, f) => s + (f.monto || 0), 0);
+
+// Ventas Directas x Hunter Douglas = registros tipo 'hd' (canal hd)
+const ventasHD = allFacturacion
+  .filter(f => f.anio === anio && f.mes_desde <= hasta && f.mes_hasta >= desde && f.canal === 'hd')
+  .reduce((s, f) => s + (f.monto || 0), 0);
+
+// Si no hay canal definido, mostrar totales por distribuidor vs total
+const ventaDistShow = ventaDirectaDist > 0 ? ventaDirectaDist : totalVentas;
+const ventaHDShow = ventasHD > 0 ? ventasHD : 0;
 
 document.getElementById('kpi-ventas-total').textContent = fmtMoneyFull(totalVentas);
 document.getElementById('kpi-dist-activos').textContent = distConVentas || distribuidores.length;
-document.getElementById('kpi-ticket').textContent = fmtMoneyFull(ticketProm);
 document.getElementById('kpi-obras').textContent = obrasGanadas;
-document.getElementById('kpi-productos').textContent = productosCount || 3;
+document.getElementById('kpi-venta-directa-dist').textContent = fmtMoneyFull(ventaDistShow);
+document.getElementById('kpi-ventas-hd').textContent = fmtMoneyFull(ventaHDShow);
 }
-
 function renderTop5() {
 const anio = getSelectedAnio();
 const { desde, hasta } = getSelectedPeriodo();
@@ -1129,30 +1152,32 @@ const anio = parseInt(document.getElementById('fact-anio').value);
 const mesDesde = parseInt(document.getElementById('fact-mes-desde').value);
 const mesHasta = parseInt(document.getElementById('fact-mes-hasta').value);
 const notas = document.getElementById('fact-notas').value;
+const canal = document.getElementById('fact-canal').value;
 
 if (!clienteId) { alert('Seleccione un distribuidor'); return; }
-if (!monto || monto <= 0) { alert('Ingrese un monto válido'); return; }
+if (!monto || monto <= 0) { alert('Ingrese un monto valido'); return; }
 if (mesDesde > mesHasta) { alert('El mes desde no puede ser mayor al mes hasta'); return; }
 
 showLoading(true);
 try {
-const { error } = await db.from('facturacion').insert({
-cliente_id: parseInt(clienteId),
-monto, anio, mes_desde: mesDesde, mes_hasta: mesHasta,
-notas: notas || null
-});
-if (error) throw error;
-document.getElementById('fact-success').style.display = 'block';
-setTimeout(() => { document.getElementById('fact-success').style.display = 'none'; }, 3000);
-document.getElementById('fact-monto').value = '';
-document.getElementById('fact-notas').value = '';
-await loadFacturacion();
+  const { error } = await db.from('facturacion').insert({
+    cliente_id: parseInt(clienteId),
+    monto, anio, mes_desde: mesDesde, mes_hasta: mesHasta,
+    notas: notas || null,
+    canal: canal || null
+  });
+  if (error) throw error;
+  document.getElementById('fact-success').style.display = 'block';
+  setTimeout(() => { document.getElementById('fact-success').style.display = 'none'; }, 3000);
+  document.getElementById('fact-monto').value = '';
+  document.getElementById('fact-notas').value = '';
+  document.getElementById('fact-canal').value = '';
+  await loadFacturacion();
 } catch(e) {
-alert('Error al guardar: ' + e.message + '\n\nAsegurate de que la tabla facturacion exista en Supabase.');
+  alert('Error al guardar: ' + e.message + '\n\nAsegurate de que la tabla facturacion exista en Supabase.');
 }
 showLoading(false);
 }
-
 async function loadFacturacionList() {
 try {
 const { data, error } = await db.from('facturacion').select('*, clientes(nombre)').order('anio', { ascending: false }).order('id', { ascending: false });
@@ -1213,56 +1238,95 @@ return '<tr><td>'+medal+'</td><td><strong>'+d.nombre+'</strong></td><td class="f
 }).join('');
 }
 
-function handleCSVImport(event) {
+function handleFileImport(event) {
 const file = event.target.files[0];
 if (!file) return;
+const ext = file.name.split('.').pop().toLowerCase();
 const reader = new FileReader();
-reader.onload = function(e) {
-const text = e.target.result;
-const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-csvParsedData = [];
-const preview = [];
-lines.forEach((line, idx) => {
-if (idx === 0 && line.toLowerCase().includes('nombre')) return;
-const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
-if (parts.length >= 4) {
-csvParsedData.push({
-nombre: parts[0], monto: parseFloat(parts[1])||0,
-anio: parseInt(parts[2])||2025, mes_desde: parseInt(parts[3])||1,
-mes_hasta: parseInt(parts[4])||parseInt(parts[3])||1,
-notas: parts[5]||''
-});
-preview.push('<tr><td>'+parts[0]+'</td><td>'+fmtMoneyFull(parseFloat(parts[1])||0)+'</td><td>'+parts[2]+'</td><td>'+parts[3]+'-'+parts[4]+'</td></tr>');
-}
-});
-document.getElementById('csv-preview').style.display = 'block';
-document.getElementById('csv-preview-table').innerHTML = '<table class="facturacion-table"><thead><tr><th>Nombre</th><th>Monto</th><th>Año</th><th>Período</th></tr></thead><tbody>'+preview.join('')+'</tbody></table><div style="font-size:0.8em;color:#666;margin-top:6px">'+csvParsedData.length+' registros listos para importar</div>';
-};
-reader.readAsText(file);
-}
 
+reader.onload = function(e) {
+  let rows = [];
+  if (ext === 'csv') {
+    const text = e.target.result;
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    lines.forEach((line, idx) => {
+      if (idx === 0 && line.toLowerCase().includes('nombre')) return;
+      const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
+      if (parts.length >= 4) rows.push({
+        nombre: parts[0], monto: parseFloat(parts[1])||0,
+        anio: parseInt(parts[2])||2025, mes_desde: parseInt(parts[3])||1,
+        mes_hasta: parseInt(parts[4])||parseInt(parts[3])||1,
+        notas: parts[5]||'', canal: parts[6]||''
+      });
+    });
+  } else {
+    // Excel via SheetJS
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    jsonData.forEach(row => {
+      const keys = Object.keys(row).map(k => k.toLowerCase().trim());
+      const get = (names) => {
+        for (const n of names) {
+          const k = Object.keys(row).find(k2 => k2.toLowerCase().trim() === n);
+          if (k !== undefined && row[k] !== '') return row[k];
+        }
+        return '';
+      };
+      const nombre = String(get(['nombre','distribuidor','distribuidor_nombre','name']) || '').trim();
+      if (!nombre) return;
+      rows.push({
+        nombre,
+        monto: parseFloat(get(['monto','importe','ventas','total','amount'])) || 0,
+        anio: parseInt(get(['anio','año','year'])) || 2025,
+        mes_desde: parseInt(get(['mes_desde','mes desde','from','desde'])) || 1,
+        mes_hasta: parseInt(get(['mes_hasta','mes hasta','to','hasta'])) || 1,
+        notas: String(get(['notas','nota','notes','observaciones']) || ''),
+        canal: String(get(['canal','channel','tipo_venta']) || '').toLowerCase()
+      });
+    });
+  }
+  csvParsedData = rows;
+  const preview = rows.map(r =>
+    '<tr><td>'+r.nombre+'</td><td>'+fmtMoneyFull(r.monto)+'</td><td>'+r.anio+'</td><td>'+r.mes_desde+'-'+r.mes_hasta+'</td><td>'+(r.canal||'-')+'</td></tr>'
+  );
+  document.getElementById('csv-preview').style.display = 'block';
+  document.getElementById('csv-preview-table').innerHTML =
+    '<table class="facturacion-table"><thead><tr><th>Nombre</th><th>Monto</th><th>Año</th><th>Período</th><th>Canal</th></tr></thead><tbody>'+preview.join('')+'</tbody></table>' +
+    '<div style="font-size:0.8em;color:#666;margin-top:6px">'+rows.length+' registros listos para importar</div>';
+};
+
+if (ext === 'csv') reader.readAsText(file);
+else reader.readAsArrayBuffer(file);
+}
 async function importCSVData() {
 if (!csvParsedData.length) return;
 showLoading(true);
-let ok = 0, err = 0;
+let ok = 0, err = 0, notFound = [];
 for (const row of csvParsedData) {
-const cliente = allClientes.find(c => c.nombre.toLowerCase().trim() === row.nombre.toLowerCase().trim());
-if (!cliente) { err++; continue; }
-const { error } = await db.from('facturacion').insert({
-cliente_id: cliente.id, monto: row.monto, anio: row.anio,
-mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas||null
-});
-if (error) err++; else ok++;
+  const cliente = allClientes.find(c => c.nombre.toLowerCase().trim() === row.nombre.toLowerCase().trim());
+  if (!cliente) { err++; notFound.push(row.nombre); continue; }
+  const payload = {
+    cliente_id: cliente.id, monto: row.monto, anio: row.anio,
+    mes_desde: row.mes_desde, mes_hasta: row.mes_hasta,
+    notas: row.notas || null,
+    canal: row.canal || null
+  };
+  const { error } = await db.from('facturacion').insert(payload);
+  if (error) err++; else ok++;
 }
 showLoading(false);
-alert('Importación completada:\n\u2705 '+ok+' registros importados\n\u274C '+err+' registros con error (nombre no encontrado)');
+let msg = 'Importacion completada:\n\u2705 '+ok+' registros importados';
+if (err > 0) msg += '\n\u274C '+err+' con error';
+if (notFound.length > 0) msg += '\n\nNo encontrados: ' + notFound.slice(0,5).join(', ');
+alert(msg);
 document.getElementById('csv-preview').style.display = 'none';
-document.getElementById('csv-input').value = '';
+document.getElementById('excel-input').value = '';
 csvParsedData = [];
 await loadFacturacion();
 loadFacturacionList();
 }
-
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('filter-subcategoria').addEventListener('change', onFilterSubcategoriaChange);
