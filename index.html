@@ -176,7 +176,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 .alert-info { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #1565c0; margin-bottom: 12px; }
 .alert-success { background: #e8f5e9; border-left: 4px solid #28a745; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #155724; margin-bottom: 12px; display: none; }
 /* Sales bubble markers */
-.sales-label { background: white; border: 2.5px solid #28a745; border-radius: 8px; padding: 3px 7px; font-size: 11px; font-weight: 700; color: #28a745; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.sales-label { background: rgba(20,120,50,0.92); border: 2px solid rgba(255,255,255,0.6); border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 700; color: #ffffff; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.45); text-shadow: 0 1px 2px rgba(0,0,0,0.5); letter-spacing: 0.3px; }
 </style>
 </head>
 <body>
@@ -788,8 +788,8 @@ const monto = getFacturadoForCliente(d.id, anio, desde, hasta);
 if (monto <= 0) return;
 const label = L.marker([d.lat, d.lng], {
 icon: L.divIcon({
-html: '<div class="sales-label">' + fmtMoney(monto) + '</div>',
-className: '', iconAnchor: [30, -10]
+html: '<div class="sales-label"><div style="font-size:9px;opacity:0.85;margin-bottom:1px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + d.nombre + '</div><div>' + fmtMoneyFull(monto) + '</div></div>',
+className: '', iconAnchor: [50, -4]
 }),
 interactive: false, zIndexOffset: 500
 });
