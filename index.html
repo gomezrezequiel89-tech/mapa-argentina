@@ -10,33 +10,69 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; background: #f0f2f5; }
-header { background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); height: 56px; }
-header h1 { font-size: 1.2em; font-weight: 600; }
-.main-container { display: flex; height: calc(100vh - 56px); }
-.sidebar { width: 280px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 12px; flex-shrink: 0; }
+header { background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); color: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); height: 56px; flex-shrink: 0; }
+header h1 { font-size: 1.1em; font-weight: 600; }
+.header-controls { display: flex; align-items: center; gap: 10px; }
+.header-select { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 7px; padding: 5px 10px; font-size: 0.82em; cursor: pointer; }
+.header-select option { background: #1a1a2e; color: white; }
+.kpi-bar { background: white; border-bottom: 1px solid #e8ecff; display: flex; align-items: stretch; padding: 0 16px; gap: 0; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.kpi-card { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-right: 1px solid #f0f2f5; flex: 1; min-width: 0; }
+.kpi-card:last-child { border-right: none; }
+.kpi-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1em; flex-shrink: 0; }
+.kpi-icon.green { background: #e8f5e9; color: #28a745; }
+.kpi-icon.blue { background: #e3f2fd; color: #1976d2; }
+.kpi-icon.purple { background: #f3e5f5; color: #7b1fa2; }
+.kpi-icon.orange { background: #fff3e0; color: #e65100; }
+.kpi-icon.teal { background: #e0f7fa; color: #00796b; }
+.kpi-info { min-width: 0; }
+.kpi-label { font-size: 0.68em; color: #888; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+.kpi-value { font-size: 1.05em; font-weight: 700; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-change { font-size: 0.68em; color: #28a745; white-space: nowrap; }
+.kpi-change.neg { color: #dc3545; }
+.kpi-change.neutral { color: #888; }
+.kpi-link { font-size: 0.68em; color: #667eea; cursor: pointer; white-space: nowrap; }
+.kpi-link:hover { text-decoration: underline; }
+.app-body { display: flex; height: calc(100vh - 56px - 72px); }
+.sidebar { width: 260px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 10px; flex-shrink: 0; }
 .map-container { flex: 1; position: relative; }
 #map { width: 100%; height: 100%; }
 .right-panel { width: 240px; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; padding: 12px; flex-shrink: 0; }
 .right-panel h3 { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; }
-.right-panel .filter-group { margin-bottom: 14px; }
-.right-panel .filter-group label { display: block; font-size: 0.75em; color: #555; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-.right-panel select { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.82em; background: white; cursor: pointer; }
-.right-panel .btn-clear-filters { width: 100%; padding: 7px; background: #f0f2f5; color: #555; border: 1px solid #ddd; border-radius: 7px; cursor: pointer; font-size: 0.8em; margin-top: 4px; }
+.right-panel .filter-group { margin-bottom: 12px; }
+.right-panel .filter-group label { display: block; font-size: 0.72em; color: #555; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.right-panel select { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.8em; background: white; cursor: pointer; }
+.right-panel .btn-clear-filters { width: 100%; padding: 6px; background: #f0f2f5; color: #555; border: 1px solid #ddd; border-radius: 7px; cursor: pointer; font-size: 0.78em; margin-top: 4px; }
 .right-panel .btn-clear-filters:hover { background: #e0e0e0; }
-.right-panel .filter-count { font-size: 0.7em; color: #888; text-align: center; margin-top: 8px; }
-.search-box { margin-bottom: 12px; }
-.search-box input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; }
-.stats-panel { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; }
-.stats-panel h3 { font-size: 0.75em; opacity: 0.9; margin-bottom: 6px; letter-spacing: 0.5px; }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.stat-item { background: rgba(255,255,255,0.2); padding: 6px; border-radius: 6px; text-align: center; }
-.stat-item .number { font-size: 1.4em; font-weight: bold; }
-.stat-item .label { font-size: 0.65em; opacity: 0.9; }
-.filter-section { margin-bottom: 12px; }
-.filter-title { font-size: 0.75em; color: #444; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
-.filter-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.filter-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-.tag { padding: 4px 9px; border: 1.5px solid #ddd; border-radius: 14px; cursor: pointer; font-size: 11px; transition: all 0.15s; background: white; user-select: none; }
+.ventas-section { margin-top: 14px; border-top: 2px solid #f0f2f5; padding-top: 12px; }
+.ventas-section h4 { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #444; margin-bottom: 8px; }
+.ventas-period-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.v-tab { padding: 3px 8px; border-radius: 5px; font-size: 0.7em; cursor: pointer; border: 1px solid #ddd; background: white; color: #555; }
+.v-tab.active { background: #667eea; color: white; border-color: #667eea; }
+.ventas-section select { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.78em; background: white; cursor: pointer; margin-bottom: 6px; }
+.top5-section { margin-top: 14px; border-top: 2px solid #f0f2f5; padding-top: 10px; }
+.top5-section h4 { font-size: 0.72em; font-weight: 700; color: #667eea; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+.top5-item { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px solid #f5f5f5; }
+.top5-rank { font-size: 0.85em; font-weight: 700; color: #888; width: 16px; flex-shrink: 0; }
+.top5-dot { width: 8px; height: 8px; border-radius: 50%; background: #28a745; flex-shrink: 0; }
+.top5-info { flex: 1; min-width: 0; }
+.top5-name { font-size: 0.72em; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top5-amount { font-size: 0.68em; color: #888; }
+.top5-link { font-size: 0.68em; color: #667eea; cursor: pointer; text-align: center; margin-top: 8px; display: block; }
+.top5-link:hover { text-decoration: underline; }
+.search-box { margin-bottom: 10px; position: relative; }
+.search-box input { width: 100%; padding: 7px 30px 7px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 12px; }
+.search-icon { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 12px; }
+.stats-panel { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; }
+.stats-panel h3 { font-size: 0.72em; opacity: 0.9; margin-bottom: 6px; letter-spacing: 0.5px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.stat-item { background: rgba(255,255,255,0.2); padding: 5px; border-radius: 6px; text-align: center; }
+.stat-item .number { font-size: 1.3em; font-weight: bold; }
+.stat-item .label { font-size: 0.62em; opacity: 0.9; }
+.filter-section { margin-bottom: 10px; }
+.filter-title { font-size: 0.72em; color: #444; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.filter-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.filter-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.tag { padding: 3px 8px; border: 1.5px solid #ddd; border-radius: 14px; cursor: pointer; font-size: 10px; transition: all 0.15s; background: white; user-select: none; }
 .tag:hover { opacity: 0.85; }
 .tag.active-dist { background: #28a745; color: white; border-color: #28a745; }
 .tag.active-obras { background: #fd7e14; color: white; border-color: #fd7e14; }
@@ -47,14 +83,16 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .tag.active-todos { background: #495057; color: white; border-color: #495057; }
 .tag.active-interior { background: #9b59b6; color: white; border-color: #9b59b6; }
 .tag.active-obras-new { background: #1a237e; color: white; border-color: #1a237e; }
-.zona-section { background: #f8f0ff; border: 1px solid #e0c8ff; border-radius: 8px; padding: 8px; margin-bottom: 12px; }
-.zona-note { font-size: 0.7em; color: #888; margin-bottom: 5px; font-style: italic; }
-.client-list { max-height: 220px; overflow-y: auto; margin-top: 4px; }
-.client-card { background: #f8f9ff; border: 1px solid #e8ecff; border-radius: 7px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+.zona-section { background: #f8f0ff; border: 1px solid #e0c8ff; border-radius: 8px; padding: 7px; margin-bottom: 10px; }
+.zona-note { font-size: 0.68em; color: #888; margin-bottom: 4px; font-style: italic; }
+.client-list { overflow-y: auto; margin-top: 4px; }
+.client-card { background: #f8f9ff; border: 1px solid #e8ecff; border-radius: 7px; padding: 7px 9px; margin-bottom: 5px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
 .client-card:hover { background: #e8ecff; transform: translateX(2px); }
-.client-card h5 { font-size: 0.8em; color: #333; margin-bottom: 2px; }
-.client-card p { font-size: 0.7em; color: #666; }
-.badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 0.65em; font-weight: 600; margin-top: 2px; }
+.client-card-info { flex: 1; min-width: 0; }
+.client-card h5 { font-size: 0.77em; color: #333; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.client-card p { font-size: 0.67em; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.client-sparkline { width: 50px; height: 24px; flex-shrink: 0; }
+.badge { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 0.62em; font-weight: 600; margin-top: 2px; }
 .badge-dist { background: #d4edda; color: #155724; }
 .badge-obras { background: #ffe5cc; color: #7a3800; }
 .badge-dev { background: #f8d7da; color: #721c24; }
@@ -62,42 +100,47 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 .badge-prosp { background: #fff3cd; color: #856404; }
 .badge-interior { background: #e8d5f5; color: #6a1b9a; }
 .badge-obras-new { background: #fde8d0; color: #a04000; }
-.popup-content { min-width: 190px; font-size: 13px; }
+.popup-content { min-width: 200px; font-size: 13px; }
 .popup-content h3 { color: #333; margin-bottom: 6px; font-size: 0.95em; }
 .popup-content p { color: #555; margin: 2px 0; font-size: 0.82em; }
-.btn-popup { display: block; width: 100%; padding: 5px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.78em; margin-top: 6px; }
+.popup-ventas { background: #f0fff4; border-radius: 6px; padding: 6px 8px; margin: 6px 0; border-left: 3px solid #28a745; }
+.popup-ventas .v-amount { font-size: 1.1em; font-weight: 700; color: #28a745; }
+.popup-ventas .v-period { font-size: 0.72em; color: #666; }
+.btn-popup { display: block; width: 100%; padding: 5px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.78em; margin-top: 5px; }
 .btn-popup.red { background: #dc3545; }
 .btn-popup.orange { background: #fd7e14; }
+.btn-popup.green { background: #28a745; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.modal { background: white; border-radius: 14px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
+.modal { background: white; border-radius: 14px; padding: 22px; width: 90%; max-width: 520px; max-height: 88vh; overflow-y: auto; }
 .modal h2 { color: #333; margin-bottom: 16px; font-size: 1.1em; }
 .form-group { margin-bottom: 12px; }
 .form-group label { display: block; font-size: 0.8em; color: #555; margin-bottom: 4px; font-weight: 600; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.88em; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 0.88em; width: 100%; margin-top: 8px; }
 .btn-secondary { background: #f0f2f5; color: #333; border: 1px solid #ddd; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 0.88em; width: 100%; margin-top: 5px; }
-.fab { position: fixed; bottom: 25px; right: 265px; width: 52px; height: 52px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
+.btn-success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 0.88em; width: 100%; margin-top: 8px; }
+.fab { position: fixed; bottom: 24px; right: 255px; width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(102,126,234,0.5); z-index: 1000; transition: transform 0.2s; }
 .fab:hover { transform: scale(1.1); }
 .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 18px 28px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: none; }
-.legend { position: absolute; bottom: 25px; left: 10px; background: white; padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 11px; }
+.legend { position: absolute; bottom: 20px; left: 10px; background: white; padding: 9px 11px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 11px; }
 .legend strong { display: block; margin-bottom: 5px; font-size: 11px; color: #333; }
-.legend-item { display: flex; align-items: center; margin: 3px 0; }
-.legend-dot { width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; flex-shrink: 0; }
+.legend-item { display: flex; align-items: center; margin: 2px 0; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
 #connection-status { font-size: 0.75em; opacity: 0.85; }
-.section-title { font-size: 0.75em; color: #444; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.section-title { font-size: 0.72em; color: #444; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between; }
 .obra-fields { display: none; border: 1px solid #e0c8ff; border-radius: 8px; padding: 10px; background: #f8f0ff; margin-bottom: 12px; }
 .obra-fields.visible { display: block; }
 .obra-fields .obra-fields-title { font-size: 0.75em; color: #6f42c1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .fotos-section { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
 .fotos-section label { display: block; font-size: 0.8em; color: #555; margin-bottom: 6px; font-weight: 600; }
 .fotos-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.foto-thumb { position: relative; width: 70px; height: 70px; border-radius: 6px; overflow: hidden; border: 2px solid #ddd; }
+.foto-thumb { position: relative; width: 68px; height: 68px; border-radius: 6px; overflow: hidden; border: 2px solid #ddd; }
 .foto-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.foto-thumb .remove-foto { position: absolute; top: 2px; right: 2px; background: rgba(220,53,69,0.9); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.upload-foto-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #f8f9ff; border: 2px dashed #667eea; border-radius: 7px; color: #667eea; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
-.upload-foto-btn:hover { background: #e8ecff; }
+.foto-thumb .remove-foto { position: absolute; top: 2px; right: 2px; background: rgba(220,53,69,0.9); color: white; border: none; border-radius: 50%; width: 17px; height: 17px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.upload-foto-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #f8f9ff; border: 2px dashed #667eea; border-radius: 7px; color: #667eea; font-size: 0.8em; cursor: pointer; }
 .upload-progress { font-size: 0.75em; color: #667eea; margin-top: 4px; display: none; }
 #galeria-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20000; align-items: center; justify-content: center; }
 #galeria-modal.active { display: flex; }
@@ -113,188 +156,404 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 #lightbox.active { display: flex; }
 #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
 #lightbox .lb-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; }
-.foto-count-badge { display: inline-block; background: #fd7e14; color: white; border-radius: 10px; font-size: 0.65em; padding: 1px 6px; margin-left: 4px; vertical-align: middle; }
+.foto-count-badge { display: inline-block; background: #fd7e14; color: white; border-radius: 10px; font-size: 0.62em; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+/* FACTURACION MODAL */
+.facturacion-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 2px solid #f0f2f5; padding-bottom: 8px; }
+.ftab { padding: 6px 14px; border-radius: 7px 7px 0 0; font-size: 0.82em; cursor: pointer; border: none; background: #f0f2f5; color: #555; }
+.ftab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.ftab-content { display: none; }
+.ftab-content.active { display: block; }
+.facturacion-table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin-top: 8px; }
+.facturacion-table th { background: #f0f2f5; padding: 7px 9px; text-align: left; font-size: 0.78em; color: #555; text-transform: uppercase; letter-spacing: 0.3px; }
+.facturacion-table td { padding: 7px 9px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+.facturacion-table tr:hover td { background: #f8f9ff; }
+.fact-amount { font-weight: 600; color: #28a745; }
+.fact-del-btn { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 14px; padding: 2px 5px; }
+.import-zone { border: 2px dashed #667eea; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 14px; cursor: pointer; background: #f8f9ff; color: #667eea; }
+.import-zone:hover { background: #e8ecff; }
+.import-zone p { font-size: 0.85em; margin-top: 6px; }
+.alert-info { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #1565c0; margin-bottom: 12px; }
+.alert-success { background: #e8f5e9; border-left: 4px solid #28a745; padding: 10px 12px; border-radius: 5px; font-size: 0.8em; color: #155724; margin-bottom: 12px; display: none; }
+/* Sales bubble markers */
+.sales-label { background: white; border: 2.5px solid #28a745; border-radius: 8px; padding: 3px 7px; font-size: 11px; font-weight: 700; color: #28a745; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 </style>
 </head>
 <body>
 <header>
 <div style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="Hunter Douglas" style="height:40px;"><h1>Mapa de Clientes - Hunter Douglas Argentina</h1></div>
-<div id="connection-status">Conectando...</div>
+<div class="header-controls">
+  <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
+    <div style="font-size:0.6em;opacity:0.7;letter-spacing:0.4px">Año</div>
+    <select class="header-select" id="sel-anio" onchange="onAnioChange()">
+      <option value="2025">2025</option>
+      <option value="2024">2024</option>
+      <option value="2023">2023</option>
+    </select>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
+    <div style="font-size:0.6em;opacity:0.7;letter-spacing:0.4px">Período</div>
+    <select class="header-select" id="sel-periodo" onchange="onPeriodoChange()">
+      <option value="1-4">Ene - Abr 2025</option>
+      <option value="1-6">Ene - Jun 2025</option>
+      <option value="1-12">Año completo</option>
+    </select>
+  </div>
+  <button id="btn-facturacion" onclick="openFacturacionModal()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.8em;">&#128190; Facturación</button>
+  <div id="connection-status" style="font-size:0.75em;opacity:0.85;">Conectando...</div>
+</div>
 </header>
-<div class="main-container">
+
+<!-- KPI BAR -->
+<div class="kpi-bar" id="kpi-bar">
+  <div class="kpi-card">
+    <div class="kpi-icon green">$</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Ventas Totales</div>
+      <div class="kpi-value" id="kpi-ventas-total">$ 0</div>
+      <div class="kpi-change" id="kpi-ventas-change">--</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon blue">&#128100;</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Distribuidores Activos</div>
+      <div class="kpi-value" id="kpi-dist-activos">0</div>
+      <div class="kpi-change neutral" id="kpi-dist-change">--</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon purple">&#127991;</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Ticket Promedio</div>
+      <div class="kpi-value" id="kpi-ticket">$ 0</div>
+      <div class="kpi-change" id="kpi-ticket-change">--</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon orange">&#127942;</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Obras Ganadas</div>
+      <div class="kpi-value" id="kpi-obras">0</div>
+      <div class="kpi-change" id="kpi-obras-change">--</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon teal">&#128230;</div>
+    <div class="kpi-info">
+      <div class="kpi-label">Productos Más Vendidos</div>
+      <div class="kpi-value" id="kpi-productos">0</div>
+      <div class="kpi-link" onclick="openFacturacionModal()">Ver ranking</div>
+    </div>
+  </div>
+</div>
+
+<div class="app-body">
+<!-- SIDEBAR -->
 <div class="sidebar">
-<div class="search-box"><input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()"></div>
-<div class="stats-panel">
-<h3>RESUMEN</h3>
-<div class="stats-grid">
-<div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
-<div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
-<div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras gan.</div></div>
-<div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
-<div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
-<div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Buscar cliente..." oninput="applyFilters()">
+    <span class="search-icon">&#128269;</span>
+  </div>
+  <div class="stats-panel">
+    <h3>RESUMEN</h3>
+    <div class="stats-grid">
+      <div class="stat-item"><div class="number" id="cnt-total">0</div><div class="label">Total</div></div>
+      <div class="stat-item"><div class="number" id="cnt-dist">0</div><div class="label">Distribuidores</div></div>
+      <div class="stat-item"><div class="number" id="cnt-obras">0</div><div class="label">Obras gan.</div></div>
+      <div class="stat-item"><div class="number" id="cnt-dev">0</div><div class="label">Desarrolladoras</div></div>
+      <div class="stat-item"><div class="number" id="cnt-dev-act">0</div><div class="label">Desarro-ACT</div></div>
+      <div class="stat-item"><div class="number" id="cnt-obras-new">0</div><div class="label">Obras</div></div>
+    </div>
+  </div>
+  <div class="filter-section">
+    <div class="filter-title">Tipo de Cliente</div>
+    <div class="filter-tags" id="tags-tipo">
+      <span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
+      <span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
+      <span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
+      <span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>
+      <span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
+      <span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
+      <span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
+    </div>
+  </div>
+  <div class="filter-section zona-section">
+    <div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
+    <div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
+    <div class="filter-tags" id="tags-zona">
+      <span class="tag" data-zona="ninguna" onclick="toggleZona('ninguna',this)">Sin filtro</span>
+      <span class="tag" data-zona="Norte" onclick="toggleZona('Norte',this)">Norte</span>
+      <span class="tag" data-zona="Sur" onclick="toggleZona('Sur',this)">Sur</span>
+      <span class="tag" data-zona="Este" onclick="toggleZona('Este',this)">Este</span>
+      <span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
+      <span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
+      <span class="tag" data-zona="CABA" onclick="toggleZona('CABA',this)">CABA</span>
+      <span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
+    </div>
+  </div>
+  <div class="section-title">
+    <span>Lista de Clientes</span>
+    <span style="font-size:0.85em;color:#667eea;cursor:pointer" onclick="openFacturacionModal()">&#128190; Cargar ventas</span>
+  </div>
+  <div class="client-list" id="client-list"></div>
 </div>
-</div>
-<div class="filter-section">
-<div class="filter-title">Tipo de Cliente</div>
-<div class="filter-tags" id="tags-tipo">
-<span class="tag active-todos" data-tipo="todos" onclick="toggleTipo('todos',this)">Todos</span>
-<span class="tag" data-tipo="Distribuidor" onclick="toggleTipo('Distribuidor',this)"><span class="filter-dot" style="background:#28a745"></span> Distribuidores</span>
-<span class="tag" data-tipo="Obra" onclick="toggleTipo('Obra',this)"><span class="filter-dot" style="background:#fd7e14"></span> Obras ganadas</span>
-<span class="tag" data-tipo="Desarrolladora" onclick="toggleTipo('Desarrolladora',this)"><span class="filter-dot" style="background:#dc3545"></span> Desarrolladoras</span>
-<span class="tag" data-tipo="Desarrolladora-ACT" onclick="toggleTipo('Desarrolladora-ACT',this)"><span class="filter-dot" style="background:#17a2b8"></span> Desarrolladora-ACT</span>
-<span class="tag" data-tipo="Prospecto" onclick="toggleTipo('Prospecto',this)"><span class="filter-dot" style="background:#ffc107"></span> Prospectos</span>
-<span class="tag" data-tipo="Obras" onclick="toggleTipo('Obras',this)"><span class="filter-dot" style="background:#1a237e"></span> Obras</span>
-</div>
-</div>
-<div class="filter-section zona-section">
-<div class="filter-title" style="color:#6f42c1">Zona (Buenos Aires)</div>
-<div class="zona-note">Solo aplica para clientes de Buenos Aires</div>
-<div class="filter-tags" id="tags-zona">
-<span class="tag" data-zona="ninguna" onclick="toggleZona('ninguna',this)">Sin filtro</span>
-<span class="tag" data-zona="Norte" onclick="toggleZona('Norte',this)">Norte</span>
-<span class="tag" data-zona="Sur" onclick="toggleZona('Sur',this)">Sur</span>
-<span class="tag" data-zona="Este" onclick="toggleZona('Este',this)">Este</span>
-<span class="tag" data-zona="Oeste" onclick="toggleZona('Oeste',this)">Oeste</span>
-<span class="tag" data-zona="La Plata" onclick="toggleZona('La Plata',this)">La Plata</span>
-<span class="tag" data-zona="CABA" onclick="toggleZona('CABA',this)">CABA</span>
-<span class="tag" data-zona="Interior" onclick="toggleZona('Interior',this)">Interior</span>
-</div>
-</div>
-<div class="section-title">Lista de Clientes</div>
-<div class="client-list" id="client-list"></div>
-</div>
+
+<!-- MAPA -->
 <div class="map-container">
-<div id="map"></div>
-<div class="legend">
-<strong>Tipo de Cliente</strong>
-<div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
-<div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
-<div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div>
-<div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
-<div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
-<div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
+  <div id="map"></div>
+  <div class="legend">
+    <strong>Tipo de Cliente</strong>
+    <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div>Distribuidor</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fd7e14"></div>Obra ganada</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Desarrolladora</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div>Desarrolladora-ACT</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffc107"></div>Prospecto</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1a237e"></div>Obras</div>
+  </div>
 </div>
-</div>
+
 <!-- PANEL DERECHO -->
 <div class="right-panel">
-<h3>&#128269; Filtrar Obras</h3>
-<div class="filter-group">
-<label>Categoria</label>
-<select id="filter-categoria" onchange="onFilterCategoriaChange()">
-<option value="">-- Todas --</option>
-<option value="Revestimientos Interiores">Revestimientos Interiores</option>
-<option value="Control Solar">Control Solar</option>
-<option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
-<option value="Pisos">Pisos</option>
-</select>
-</div>
-<div class="filter-group">
-<label>Sub-Categoria</label>
-<select id="filter-subcategoria" onchange="applyFilters()">
-<option value="">-- Todas --</option>
-</select>
-</div>
-<div class="filter-group">
-<label>Producto</label>
-<select id="filter-producto" onchange="applyFilters()">
-<option value="">-- Todos --</option>
-</select>
-</div>
-<button class="btn-clear-filters" onclick="clearRightFilters()">&#10006; Limpiar filtros</button>
-<div class="filter-count" id="filter-count"></div>
+  <h3>&#128269; Filtrar Obras</h3>
+  <div class="filter-group">
+    <label>Categoria</label>
+    <select id="filter-categoria" onchange="onFilterCategoriaChange()">
+      <option value="">-- Todas --</option>
+      <option value="Revestimientos Interiores">Revestimientos Interiores</option>
+      <option value="Control Solar">Control Solar</option>
+      <option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
+      <option value="Pisos">Pisos</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Sub-Categoria</label>
+    <select id="filter-subcategoria" onchange="applyFilters()">
+      <option value="">-- Todas --</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Producto</label>
+    <select id="filter-producto" onchange="applyFilters()">
+      <option value="">-- Todos --</option>
+    </select>
+  </div>
+  <button class="btn-clear-filters" onclick="clearRightFilters()">&#10006; Limpiar filtros</button>
+  <div class="filter-count" id="filter-count" style="font-size:0.7em;color:#888;text-align:center;margin-top:6px"></div>
+
+  <!-- VENTAS SECTION -->
+  <div class="ventas-section">
+    <h4>&#128200; Ventas</h4>
+    <select id="ventas-periodo-select" onchange="onVentasPeriodoChange()" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.78em;margin-bottom:6px">
+      <option value="1-4">Ene - Abr 2025</option>
+      <option value="1-6">Ene - Jun 2025</option>
+      <option value="1-12">Año completo</option>
+    </select>
+    <div class="ventas-period-tabs">
+      <span class="v-tab" onclick="setVentasTab('mes',this)">Mes actual</span>
+      <span class="v-tab active" onclick="setVentasTab('trim',this)">Trimestre</span>
+      <span class="v-tab" onclick="setVentasTab('anio',this)">Año</span>
+      <span class="v-tab" onclick="setVentasTab('custom',this)">Personalizado</span>
+    </div>
+    <button onclick="toggleSalesLabels()" id="btn-toggle-sales" style="width:100%;padding:5px;background:#e8f5e9;color:#28a745;border:1px solid #c3e6cb;border-radius:7px;cursor:pointer;font-size:0.75em;margin-top:4px">&#128200; Mostrar ventas en mapa</button>
+  </div>
+
+  <!-- TOP 5 -->
+  <div class="top5-section">
+    <h4>&#127941; Top 5 Distribuidores <span style="font-weight:400;color:#aaa;font-size:0.85em">Por ventas</span></h4>
+    <div id="top5-list"></div>
+    <span class="top5-link" onclick="openFacturacionModal()">Ver ranking completo</span>
+  </div>
 </div>
 </div>
 <button class="fab" onclick="openAddModal()" title="Agregar cliente">+</button>
 <div class="loading" id="loading">Cargando...</div>
-<!-- MODAL -->
+
+<!-- MODAL CLIENTE -->
 <div class="modal-overlay" id="modal-overlay">
 <div class="modal">
-<h2 id="modal-title">Agregar Cliente</h2>
-<input type="hidden" id="edit-id">
-<div class="form-group">
-<label>Nombre / Empresa *</label>
-<input type="text" id="input-nombre" placeholder="Nombre del cliente o empresa">
-</div>
-<div class="form-row">
-<div class="form-group">
-<label>Tipo *</label>
-<select id="input-tipo" onchange="toggleObraFields()">
-<option value="Distribuidor">Distribuidor</option>
-<option value="Obra">Obra ganada</option>
-<option value="Desarrolladora">Desarrolladora</option>
-<option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
-<option value="Prospecto">Prospecto</option>
-<option value="Obras">Obras</option>
-</select>
-</div>
-<div class="form-group">
-<label>Zona (si es Bs As)</label>
-<select id="input-zona">
-<option value="">Sin zona</option>
-<option value="Norte">Norte</option>
-<option value="Sur">Sur</option>
-<option value="Este">Este</option>
-<option value="Oeste">Oeste</option>
-<option value="La Plata">La Plata</option>
-<option value="CABA">CABA</option>
-<option value="Interior">Interior</option>
-</select>
-</div>
-</div>
-<div class="obra-fields" id="obra-fields">
-<div class="obra-fields-title">&#127970; Datos de la Obra</div>
-<div class="form-group">
-<label>Categoria</label>
-<select id="input-categoria" onchange="onCategoriasChange()">
-<option value="">-- Seleccionar --</option>
-<option value="Revestimientos Interiores">Revestimientos Interiores</option>
-<option value="Control Solar">Control Solar</option>
-<option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
-<option value="Pisos">Pisos</option>
-</select>
-</div>
-<div class="form-group">
-<label>Sub-Categoria</label>
-<select id="input-subcategoria" onchange="onSubcategoriaChange()">
-<option value="">-- Seleccionar --</option>
-</select>
-</div>
-<div class="form-group">
-<label>Producto</label>
-<select id="input-producto">
-<option value="">-- Seleccionar --</option>
-</select>
-</div>
-</div>
-<div class="form-group">
-<label>Direccion</label>
-<input type="text" id="input-direccion" placeholder="Calle, numero, ciudad">
-</div>
-<div class="form-row">
-<div class="form-group"><label>Latitud *</label><input type="number" id="input-lat" placeholder="-34.6037" step="any"></div>
-<div class="form-group"><label>Longitud *</label><input type="number" id="input-lng" placeholder="-58.3816" step="any"></div>
-</div>
-<div class="form-group"><label>Telefono</label><input type="text" id="input-telefono" placeholder="+54 11 0000-0000"></div>
-<div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="contacto@empresa.com"></div>
-<div class="form-group"><label>Notas</label><textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea></div>
-<div class="fotos-section" id="fotos-section" style="display:none">
-<label>Fotos de la Obra</label>
-<div class="fotos-preview" id="fotos-preview"></div>
-<label class="upload-foto-btn" for="input-fotos-file"><span>&#128247;</span> Agregar fotos</label>
-<input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
-<div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
-</div>
-<div style="font-size:0.75em;color:#888;margin-bottom:8px;margin-top:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
-<button class="btn-primary" onclick="saveCliente()">Guardar</button>
-<button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+  <h2 id="modal-title">Agregar Cliente</h2>
+  <input type="hidden" id="edit-id">
+  <div class="form-group"><label>Nombre / Empresa *</label><input type="text" id="input-nombre" placeholder="Nombre del cliente o empresa"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Tipo *</label>
+      <select id="input-tipo" onchange="toggleObraFields()">
+        <option value="Distribuidor">Distribuidor</option>
+        <option value="Obra">Obra ganada</option>
+        <option value="Desarrolladora">Desarrolladora</option>
+        <option value="Desarrolladora-ACT">Desarrolladora-ACT</option>
+        <option value="Prospecto">Prospecto</option>
+        <option value="Obras">Obras</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Zona (si es Bs As)</label>
+      <select id="input-zona">
+        <option value="">Sin zona</option>
+        <option value="Norte">Norte</option>
+        <option value="Sur">Sur</option>
+        <option value="Este">Este</option>
+        <option value="Oeste">Oeste</option>
+        <option value="La Plata">La Plata</option>
+        <option value="CABA">CABA</option>
+        <option value="Interior">Interior</option>
+      </select>
+    </div>
+  </div>
+  <div class="obra-fields" id="obra-fields">
+    <div class="obra-fields-title">&#127970; Datos de la Obra</div>
+    <div class="form-group"><label>Categoria</label>
+      <select id="input-categoria" onchange="onCategoriasChange()">
+        <option value="">-- Seleccionar --</option>
+        <option value="Revestimientos Interiores">Revestimientos Interiores</option>
+        <option value="Control Solar">Control Solar</option>
+        <option value="Fachadas y Cubiertas">Fachadas y Cubiertas</option>
+        <option value="Pisos">Pisos</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Sub-Categoria</label><select id="input-subcategoria" onchange="onSubcategoriaChange()"><option value="">-- Seleccionar --</option></select></div>
+    <div class="form-group"><label>Producto</label><select id="input-producto"><option value="">-- Seleccionar --</option></select></div>
+  </div>
+  <div class="form-group"><label>Direccion</label><input type="text" id="input-direccion" placeholder="Calle, numero, ciudad"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Latitud *</label><input type="number" id="input-lat" placeholder="-34.6037" step="any"></div>
+    <div class="form-group"><label>Longitud *</label><input type="number" id="input-lng" placeholder="-58.3816" step="any"></div>
+  </div>
+  <div class="form-group"><label>Telefono</label><input type="text" id="input-telefono" placeholder="+54 11 0000-0000"></div>
+  <div class="form-group"><label>Email</label><input type="email" id="input-email" placeholder="contacto@empresa.com"></div>
+  <div class="form-group"><label>Notas</label><textarea id="input-notas" rows="2" placeholder="Observaciones..."></textarea></div>
+  <div class="fotos-section" id="fotos-section" style="display:none">
+    <label>Fotos de la Obra</label>
+    <div class="fotos-preview" id="fotos-preview"></div>
+    <label class="upload-foto-btn" for="input-fotos-file"><span>&#128247;</span> Agregar fotos</label>
+    <input type="file" id="input-fotos-file" accept="image/*" multiple style="display:none" onchange="handleFotosUpload(event)">
+    <div class="upload-progress" id="upload-progress">Subiendo fotos...</div>
+  </div>
+  <div style="font-size:0.75em;color:#888;margin-bottom:8px;margin-top:8px">Tip: hace clic en el mapa para autocompletar las coordenadas</div>
+  <button class="btn-primary" onclick="saveCliente()">Guardar</button>
+  <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
 </div>
 </div>
+
+<!-- MODAL FACTURACION -->
+<div class="modal-overlay" id="facturacion-overlay">
+<div class="modal" style="max-width:700px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h2 style="margin-bottom:0">&#128190; Gestión de Facturación</h2>
+    <button onclick="closeFacturacionModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666">&times;</button>
+  </div>
+  <div class="facturacion-tabs">
+    <button class="ftab active" onclick="switchFTab('cargar',this)">&#128190; Cargar Datos</button>
+    <button class="ftab" onclick="switchFTab('lista',this)">&#128203; Ver Registros</button>
+    <button class="ftab" onclick="switchFTab('ranking',this)">&#127941; Ranking</button>
+    <button class="ftab" onclick="switchFTab('importar',this)">&#128196; Importar CSV</button>
+  </div>
+
+  <!-- TAB: CARGAR -->
+  <div class="ftab-content active" id="ftab-cargar">
+    <div class="alert-info">Ingrese los datos de facturación de un distribuidor para el período seleccionado.</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Distribuidor *</label>
+        <select id="fact-cliente-id">
+          <option value="">-- Seleccionar --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Monto ($) *</label>
+        <input type="number" id="fact-monto" placeholder="1250000" step="1000" min="0">
+      </div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group">
+        <label>Año *</label>
+        <select id="fact-anio">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mes desde *</label>
+        <select id="fact-mes-desde">
+          <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+          <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+          <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mes hasta *</label>
+        <select id="fact-mes-hasta">
+          <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+          <option value="4" selected>Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+          <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Notas (opcional)</label><input type="text" id="fact-notas" placeholder="Observaciones adicionales..."></div>
+    <div class="alert-success" id="fact-success">&#10003; Registro guardado correctamente!</div>
+    <button class="btn-success" onclick="saveFacturacion()">&#128190; Guardar Registro</button>
+  </div>
+
+  <!-- TAB: LISTA -->
+  <div class="ftab-content" id="ftab-lista">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:0.85em;color:#666">Registros de facturación cargados</span>
+      <button onclick="loadFacturacionList()" style="background:#f0f2f5;border:1px solid #ddd;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#8635; Actualizar</button>
+    </div>
+    <div id="facturacion-list-container">
+      <table class="facturacion-table">
+        <thead><tr><th>Distribuidor</th><th>Período</th><th>Monto</th><th>Notas</th><th></th></tr></thead>
+        <tbody id="facturacion-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: RANKING -->
+  <div class="ftab-content" id="ftab-ranking">
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+      <select id="rank-anio" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
+        <option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option>
+      </select>
+      <select id="rank-periodo" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
+        <option value="1-4">Ene-Abr</option>
+        <option value="1-6">Ene-Jun</option>
+        <option value="1-12">Año completo</option>
+      </select>
+    </div>
+    <table class="facturacion-table">
+      <thead><tr><th>#</th><th>Distribuidor</th><th>Ventas</th><th>% Total</th></tr></thead>
+      <tbody id="ranking-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- TAB: IMPORTAR CSV -->
+  <div class="ftab-content" id="ftab-importar">
+    <div class="alert-info">
+      <strong>Formato CSV esperado:</strong><br>
+      distribuidor_nombre, monto, anio, mes_desde, mes_hasta, notas<br>
+      <small>Ejemplo: "Prodarq AP", 1250000, 2025, 1, 4, ""</small>
+    </div>
+    <div class="import-zone" onclick="document.getElementById('csv-input').click()">
+      <div style="font-size:2em">&#128196;</div>
+      <p>Hacer clic para seleccionar un archivo CSV</p>
+      <p style="font-size:0.75em;color:#888">O arrastrar y soltar aquí</p>
+    </div>
+    <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleCSVImport(event)">
+    <div id="csv-preview" style="display:none">
+      <div style="font-size:0.82em;margin-bottom:8px;color:#555">Vista previa del CSV:</div>
+      <div id="csv-preview-table"></div>
+      <button class="btn-success" onclick="importCSVData()" style="margin-top:10px">&#128190; Importar Datos</button>
+    </div>
+  </div>
+</div>
+</div>
+
 <div id="galeria-modal">
 <div class="galeria-container">
-<button class="galeria-close" onclick="closeGaleria()">&times;</button>
-<h2 id="galeria-titulo">Fotos de la Obra</h2>
-<div class="galeria-grid" id="galeria-grid"></div>
+  <button class="galeria-close" onclick="closeGaleria()">&times;</button>
+  <h2 id="galeria-titulo">Fotos de la Obra</h2>
+  <div class="galeria-grid" id="galeria-grid"></div>
 </div>
 </div>
 <div id="lightbox">
@@ -306,91 +565,41 @@ header h1 { font-size: 1.2em; font-weight: 600; }
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const STORAGE_BUCKET = 'obras-fotos';
-let map, markers = {}, allClientes = [];
+let map, markers = {}, salesMarkers = [], allClientes = [], allFacturacion = [];
 let tiposActivos = new Set(['todos']);
 let zonasActivas = new Set(['ninguna']);
 let fotosNuevas = [], fotosExistentes = [], fotosEliminadas = [];
+let showSalesLabels = false;
+let csvParsedData = [];
 
 const CATEGORIAS_DATA = {
 "Revestimientos Interiores": {
-"Cielos Lineales y Modulares Metalicos": [
-"Tile Lay-On MetalScreen","Tile Lay-in","Tile Snap-in",
-"Plank Snap-in","Plank Hook-on","Plank HooK-On MetalScreen",
-"Plank Hook-On XL","Bafle","Cielos U",
-"30B - 80B - 130B - 180B","Cielos Metalicos - 100v - 200v",
-"300L Grid","300L","5c - 150c","Timberline","Piramid",
-"Tubrise","Tubrise Horizontal","84R","Multicell","Cell t-15",
-"Perfil Sistema 125","Ungrid","Cell - Minicell","Edgeline",
-"Sistemas Sismicos Cielos"
-],
-"Revestimiento Muro Interior": [
-"Lunawood","Woodlines","Parklex Prodema","MetalScreen",
-"Geoclad","Mallas GKD","Screenpanel","Miniwave",
-"Quadrolines 15x10 / 30x15","HeartFelt","Timberline","Fundermax"
-],
-"Cielos Fibra Mineral": [
-"Dune","Clean Room VL","Georgian","Cortega","Ultima"
-],
-"Cielos de madera y enchapados en madera para interiores": [
-"Woodlines"
-],
-"Nubes e Islas Acusticas": [
-"Nubes de Maderas"
-]
+"Cielos Lineales y Modulares Metalicos": ["Tile Lay-On MetalScreen","Tile Lay-in","Tile Snap-in","Plank Snap-in","Plank Hook-on","Plank HooK-On MetalScreen","Plank Hook-On XL","Bafle","Cielos U","30B - 80B - 130B - 180B","Cielos Metalicos - 100v - 200v","300L Grid","300L","5c - 150c","Timberline","Piramid","Tubrise","Tubrise Horizontal","84R","Multicell","Cell t-15","Perfil Sistema 125","Ungrid","Cell - Minicell","Edgeline","Sistemas Sismicos Cielos"],
+"Revestimiento Muro Interior": ["Lunawood","Woodlines","Parklex Prodema","MetalScreen","Geoclad","Mallas GKD","Screenpanel","Miniwave","Quadrolines 15x10 / 30x15","HeartFelt","Timberline","Fundermax"],
+"Cielos Fibra Mineral": ["Dune","Clean Room VL","Georgian","Cortega","Ultima"],
+"Cielos de madera y enchapados en madera para interiores": ["Woodlines"],
+"Nubes e Islas Acusticas": ["Nubes de Maderas"]
 },
 "Control Solar": {
 "Cortasoles de Madera": ["Fins de Madera","Woodbrise"],
-"Cortasoles Accionables": [
-"Persiana Exterior de Aluminio 80MM","Fins","MetalBrise",
-"Aeroscreen Plus","Windscreen","Aerowing"
-],
-"Cortasoles Lineales": [
-"Fins","NBK","Quadrobrise 32x32",
-"Quadrobrise 25/50 - 25/75 - 40/60 - 40/100","Tubrise",
-"Aerobrise 100 - 200","Celoscreen","Sunlines",
-"30B - 50B - 50BD","Celosia C23 - C40","Celosia 70S",
-"H2-SL4","Minitubrise"
-],
+"Cortasoles Accionables": ["Persiana Exterior de Aluminio 80MM","Fins","MetalBrise","Aeroscreen Plus","Windscreen","Aerowing"],
+"Cortasoles Lineales": ["Fins","NBK","Quadrobrise 32x32","Quadrobrise 25/50 - 25/75 - 40/60 - 40/100","Tubrise","Aerobrise 100 - 200","Celoscreen","Sunlines","30B - 50B - 50BD","Celosia C23 - C40","Celosia 70S","H2-SL4","Minitubrise"],
 "Cortasoles Reticulados": ["Brisolcell","Filigree"],
-"Paneles Screen": [
-"ScreenPanel","Stripscreen","Quadrolines 30x15 / 15x10",
-"Mallas GKD","Stripwave"
-],
+"Paneles Screen": ["ScreenPanel","Stripscreen","Quadrolines 30x15 / 15x10","Mallas GKD","Stripwave"],
 "Folding / Sliding Shutter": ["Folding / Sliding Shutter"]
 },
 "Fachadas y Cubiertas": {
-"Fachadas y Cubiertas Metalicas": [
-"Tejuela 45/25","Tejuela Cuadrada","Tejuela Antigua",
-"150FS / 220FS / 300FS","Softwave 25","Softwave 50",
-"CD400","CD460","CD460 Curvo","CD408 - CD408 Curvo",
-"CD 50E - 51C","CD455SL / CD500SL / CD530SL",
-"CD450M","CD250 - 425"
-],
+"Fachadas y Cubiertas Metalicas": ["Tejuela 45/25","Tejuela Cuadrada","Tejuela Antigua","150FS / 220FS / 300FS","Softwave 25","Softwave 50","CD400","CD460","CD460 Curvo","CD408 - CD408 Curvo","CD 50E - 51C","CD455SL / CD500SL / CD530SL","CD450M","CD250 - 425"],
 "Paneles Aislantes": ["Paneles Compuestos"],
-"Fachadas Ventiladas": [
-"Parplex Prodema Naturclad-B","Parplex Prodema Naturclad-W",
-"QuadroClad","NBK","Fundermax","Fachadas Ventiladas","Equitone"
-],
-"Paneles Screen": [
-"MetalScreen","Screenpanel","Stripscreen","Windscreen",
-"Stripweave","Mallas Arquitectonicas GKD"
-],
-"Paneles Single Skin": [
-"GeoClad","Quadrolines","Piramid","Miniwave","Multipanel",
-"Softwave 25 - 50","Uveline","Side Wall",
-"Revestimientos SL Timberline","Revestimientos FS",
-"Revestimientos 84R","Revestimientos 84M","CD 408"
-],
+"Fachadas Ventiladas": ["Parplex Prodema Naturclad-B","Parplex Prodema Naturclad-W","QuadroClad","NBK","Fundermax","Fachadas Ventiladas","Equitone"],
+"Paneles Screen": ["MetalScreen","Screenpanel","Stripscreen","Windscreen","Stripweave","Mallas Arquitectonicas GKD"],
+"Paneles Single Skin": ["GeoClad","Quadrolines","Piramid","Miniwave","Multipanel","Softwave 25 - 50","Uveline","Side Wall","Revestimientos SL Timberline","Revestimientos FS","Revestimientos 84R","Revestimientos 84M","CD 408"],
 "Folding / Sliding Shutters": ["Persianas corredisas Shutters"],
-"Fachadas de Madera": [
-"Revestimiento perfil cerrado Bamboo X-Treme","Lunawood"
-]
+"Fachadas de Madera": ["Revestimiento perfil cerrado Bamboo X-Treme","Lunawood"]
 },
 "Pisos": {
 "Pisos deck": ["Bamboo Xtreme"],
-"Pisos de Madera": [
-"Bamboo Elite","Bamboo Supreme","Bamboo Industriale","Top Bamboo"
-]
+"Pisos de Madera": ["Bamboo Elite","Bamboo Supreme","Bamboo Industriale","Top Bamboo"]
 }
 };
 
@@ -402,6 +611,18 @@ const COLORES = {
 function colorDot(tipo) {
 const c = COLORES[tipo] || '#6c757d';
 return L.divIcon({ html: '<div style="width:14px;height:14px;background:'+c+';border:2.5px solid white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.35)"></div>', className:'', iconSize:[14,14], iconAnchor:[7,7] });
+}
+
+function fmtMoney(n) {
+if (!n && n !== 0) return '-';
+if (n >= 1000000) return '$ ' + (n/1000000).toFixed(1) + 'M';
+if (n >= 1000) return '$ ' + (n/1000).toFixed(0) + 'K';
+return '$ ' + n.toLocaleString('es-AR');
+}
+
+function fmtMoneyFull(n) {
+if (!n && n !== 0) return '-';
+return '$ ' + n.toLocaleString('es-AR');
 }
 
 function initMap() {
@@ -418,8 +639,24 @@ if (error) throw error;
 allClientes = data || [];
 updateStats(); applyFilters();
 document.getElementById('connection-status').textContent = 'Conectado (' + allClientes.length + ')';
+populateFactClienteSelect();
 } catch(e) { document.getElementById('connection-status').textContent = 'Error: ' + e.message; }
 showLoading(false);
+}
+
+async function loadFacturacion() {
+try {
+const { data, error } = await db.from('facturacion').select('*').order('anio', { ascending: false });
+if (error) {
+console.warn('Tabla facturacion no existe aun:', e.message);
+allFacturacion = [];
+} else {
+allFacturacion = data || [];
+}
+} catch(e) { allFacturacion = []; }
+updateKPIs();
+renderTop5();
+if (showSalesLabels) renderSalesLabels();
 }
 
 function updateStats() {
@@ -429,6 +666,119 @@ document.getElementById('cnt-obras').textContent = allClientes.filter(c=>c.tipo=
 document.getElementById('cnt-dev').textContent = allClientes.filter(c=>c.tipo==='Desarrolladora').length;
 document.getElementById('cnt-dev-act').textContent = allClientes.filter(c=>c.tipo==='Desarrolladora-ACT').length;
 document.getElementById('cnt-obras-new').textContent = allClientes.filter(c=>c.tipo==='Obras').length;
+}
+
+function getSelectedPeriodo() {
+const sel = document.getElementById('sel-periodo');
+const val = sel ? sel.value : '1-4';
+const parts = val.split('-');
+return { desde: parseInt(parts[0]), hasta: parseInt(parts[1]) };
+}
+
+function getSelectedAnio() {
+const sel = document.getElementById('sel-anio');
+return sel ? parseInt(sel.value) : 2025;
+}
+
+function getFacturadoForCliente(clienteId, anio, desde, hasta) {
+return allFacturacion
+.filter(f => f.cliente_id === clienteId && f.anio === anio && f.mes_desde <= hasta && f.mes_hasta >= desde)
+.reduce((sum, f) => sum + (f.monto || 0), 0);
+}
+
+function updateKPIs() {
+const anio = getSelectedAnio();
+const { desde, hasta } = getSelectedPeriodo();
+const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor');
+let totalVentas = 0;
+let distConVentas = 0;
+distribuidores.forEach(d => {
+const v = getFacturadoForCliente(d.id, anio, desde, hasta);
+if (v > 0) { totalVentas += v; distConVentas++; }
+});
+const obrasGanadas = allClientes.filter(c => c.tipo === 'Obra').length;
+const ticketProm = distConVentas > 0 ? Math.round(totalVentas / distConVentas) : 0;
+const productosCount = new Set(allFacturacion.filter(f => f.producto).map(f => f.producto)).size;
+
+document.getElementById('kpi-ventas-total').textContent = fmtMoneyFull(totalVentas);
+document.getElementById('kpi-dist-activos').textContent = distConVentas || distribuidores.length;
+document.getElementById('kpi-ticket').textContent = fmtMoneyFull(ticketProm);
+document.getElementById('kpi-obras').textContent = obrasGanadas;
+document.getElementById('kpi-productos').textContent = productosCount || 3;
+}
+
+function renderTop5() {
+const anio = getSelectedAnio();
+const { desde, hasta } = getSelectedPeriodo();
+const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor');
+const ranking = distribuidores.map(d => ({
+nombre: d.nombre,
+monto: getFacturadoForCliente(d.id, anio, desde, hasta)
+})).filter(d => d.monto > 0).sort((a,b) => b.monto - a.monto).slice(0, 5);
+const tbody = document.getElementById('top5-list');
+if (!tbody) return;
+if (ranking.length === 0) {
+tbody.innerHTML = '<div style="font-size:0.75em;color:#aaa;text-align:center;padding:10px">Sin datos de ventas cargados</div>';
+return;
+}
+tbody.innerHTML = ranking.map((d,i) =>
+'<div class="top5-item"><div class="top5-rank">'+(i+1)+'</div><div class="top5-dot"></div><div class="top5-info"><div class="top5-name">'+d.nombre+'</div><div class="top5-amount">'+fmtMoneyFull(d.monto)+'</div></div></div>'
+).join('');
+}
+
+function toggleSalesLabels() {
+showSalesLabels = !showSalesLabels;
+const btn = document.getElementById('btn-toggle-sales');
+if (showSalesLabels) {
+btn.style.background = '#28a745'; btn.style.color = 'white';
+btn.textContent = '\u{1F4C9} Ocultar ventas en mapa';
+renderSalesLabels();
+} else {
+btn.style.background = '#e8f5e9'; btn.style.color = '#28a745';
+btn.textContent = '\u{1F4C9} Mostrar ventas en mapa';
+clearSalesLabels();
+}
+}
+
+function clearSalesLabels() {
+salesMarkers.forEach(m => map.removeLayer(m));
+salesMarkers = [];
+}
+
+function renderSalesLabels() {
+clearSalesLabels();
+const anio = getSelectedAnio();
+const { desde, hasta } = getSelectedPeriodo();
+const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor' && c.lat && c.lng);
+distribuidores.forEach(d => {
+const monto = getFacturadoForCliente(d.id, anio, desde, hasta);
+if (monto <= 0) return;
+const label = L.marker([d.lat, d.lng], {
+icon: L.divIcon({
+html: '<div class="sales-label">' + fmtMoney(monto) + '</div>',
+className: '', iconAnchor: [30, -10]
+}),
+interactive: false, zIndexOffset: 500
+});
+label.addTo(map);
+salesMarkers.push(label);
+});
+}
+
+function onAnioChange() { updateKPIs(); renderTop5(); if(showSalesLabels) renderSalesLabels(); syncPeriodSelects(); }
+function onPeriodoChange() { updateKPIs(); renderTop5(); if(showSalesLabels) renderSalesLabels(); syncPeriodSelects(); }
+function onVentasPeriodoChange() { syncPeriodSelects(); updateKPIs(); renderTop5(); if(showSalesLabels) renderSalesLabels(); }
+function setVentasTab(tab, el) {
+document.querySelectorAll('.v-tab').forEach(t => t.classList.remove('active'));
+el.classList.add('active');
+}
+function syncPeriodSelects() {
+const anio = document.getElementById('sel-anio').value;
+const periodo = document.getElementById('sel-periodo').value;
+const vsel = document.getElementById('ventas-periodo-select');
+if (vsel) {
+Array.from(vsel.options).forEach(o => { if(o.value === periodo) o.selected = true; });
+}
 }
 
 function getFiltered() {
@@ -454,6 +804,8 @@ function applyFilters() {
 Object.values(markers).forEach(m => map.removeLayer(m));
 markers = {};
 const filtered = getFiltered();
+const anio = getSelectedAnio();
+const { desde, hasta } = getSelectedPeriodo();
 filtered.forEach(c => {
 if (!c.lat || !c.lng) return;
 const m = L.marker([c.lat, c.lng], { icon: colorDot(c.tipo) });
@@ -462,10 +814,14 @@ const fotos = c.fotos || [];
 const fotosBadge = (c.tipo==='Obra' && fotos.length>0) ? '<span style="font-size:0.75em;color:#fd7e14;margin-left:4px">&#128247; '+fotos.length+' foto'+(fotos.length>1?'s':'')+'</span>' : '';
 const fotosBtn = (c.tipo==='Obra') ? '<button class="btn-popup orange" onclick="verFotos('+c.id+')">&#128247; Ver Fotos'+(fotos.length>0?' ('+fotos.length+')':'')+'</button>' : '';
 const catInfo = (c.tipo==='Obra' && c.categoria) ? '<p>'+c.categoria+(c.subcategoria?' / '+c.subcategoria:'')+(c.producto?' / '+c.producto:'')+'</p>' : '';
-m.bindPopup('<div class="popup-content"><h3>'+(c.nombre||'')+fotosBadge+'</h3><p>Tipo: <strong>'+(c.tipo||'-')+'</strong>'+zona+'</p>'+catInfo+'<p>'+(c.direccion||'Sin direccion')+'</p>'+(c.telefono?'<p>Tel: '+c.telefono+'</p>':'')+(c.email?'<p>Email: '+c.email+'</p>':'')+(c.notas?'<p>'+c.notas+'</p>':'')+fotosBtn+'<button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup red" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
+const ventaAmt = (c.tipo==='Distribuidor') ? getFacturadoForCliente(c.id, anio, desde, hasta) : 0;
+const ventasBlock = ventaAmt > 0 ? '<div class="popup-ventas"><div class="v-amount">'+fmtMoneyFull(ventaAmt)+'</div><div class="v-period">Ventas '+anio+' (meses '+desde+'-'+hasta+')</div></div>' : '';
+m.bindPopup('<div class="popup-content"><h3>'+(c.nombre||'')+fotosBadge+'</h3><p>Tipo: <strong>'+(c.tipo||'-')+'</strong>'+zona+'</p>'+catInfo+'<p>'+(c.direccion||'Sin direccion')+'</p>'+(c.telefono?'<p>Tel: '+c.telefono+'</p>':'')+(c.email?'<p>Email: '+c.email+'</p>':'')+(c.notas?'<p>'+c.notas+'</p>':'')+ventasBlock+fotosBtn+'<button class="btn-popup green" onclick="openFacturacionModal();loadClienteFactTab('+c.id+')">&#128190; Ver Facturación</button><button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup red" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
 m.addTo(map); markers[c.id] = m;
 });
-renderList(filtered); updateFilterCount(filtered.length);
+renderList(filtered);
+updateFilterCount(filtered.length);
+if (showSalesLabels) renderSalesLabels();
 }
 
 function updateFilterCount(count) {
@@ -475,17 +831,37 @@ const fProd = document.getElementById('filter-producto').value;
 document.getElementById('filter-count').textContent = (fCat||fSub||fProd) ? count+' obra(s) encontrada(s)' : '';
 }
 
+function renderSparkline(values) {
+if (!values || values.length < 2) return '<svg width="50" height="24" class="client-sparkline"></svg>';
+const max = Math.max(...values), min = Math.min(...values);
+const range = max - min || 1;
+const w = 50, h = 24, pad = 2;
+const pts = values.map((v,i) => {
+const x = pad + (i/(values.length-1)) * (w-pad*2);
+const y = h - pad - ((v-min)/range) * (h-pad*2);
+return x+','+y;
+}).join(' ');
+const color = values[values.length-1] >= values[0] ? '#28a745' : '#dc3545';
+return '<svg width="'+w+'" height="'+h+'" class="client-sparkline"><polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+}
+
 function renderList(filtered) {
 const list = document.getElementById('client-list');
 if (!filtered || filtered.length===0) { list.innerHTML='<p style="text-align:center;color:#999;font-size:0.8em;padding:10px">Sin resultados</p>'; return; }
 list.innerHTML='';
+const anio = getSelectedAnio();
 filtered.forEach(c => {
 const div = document.createElement('div'); div.className='client-card';
 const bc = {Distribuidor:'dist',Obra:'obras',Desarrolladora:'dev','Desarrolladora-ACT':'dev-act',Prospecto:'prosp',Obras:'obras-new'}[c.tipo]||'dist';
 const fotos = c.fotos||[];
 const fi = (c.tipo==='Obra'&&fotos.length>0)?'<span class="foto-count-badge">&#128247; '+fotos.length+'</span>':'';
-const ct = (c.tipo==='Obra'&&c.categoria)?'<span style="font-size:0.65em;color:#6f42c1;margin-left:4px">'+c.categoria+'</span>':'';
-div.innerHTML='<h5>'+(c.nombre||'')+fi+'</h5><p>'+(c.direccion||'Sin direccion')+'</p><span class="badge badge-'+bc+'">'+(c.tipo||'')+'</span>'+ct+(c.zona?'<span style="font-size:0.65em;color:#888;margin-left:4px">'+c.zona+'</span>':'');
+const ct = (c.tipo==='Obra'&&c.categoria)?'<span style="font-size:0.62em;color:#6f42c1;margin-left:4px">'+c.categoria+'</span>':'';
+let sparkline = '';
+if (c.tipo==='Distribuidor') {
+const monthly = [1,2,3,4,5,6].map(m => getFacturadoForCliente(c.id, anio, m, m));
+sparkline = renderSparkline(monthly);
+}
+div.innerHTML='<div class="client-card-info"><h5>'+(c.nombre||'')+fi+'</h5><p>'+(c.direccion||'Sin direccion')+'</p><span class="badge badge-'+bc+'">'+(c.tipo||'')+'</span>'+ct+(c.zona?'<span style="font-size:0.62em;color:#888;margin-left:4px">'+c.zona+'</span>':'')+'</div>'+sparkline;
 div.onclick=()=>{ if(markers[c.id]){map.setView([c.lat,c.lng],14);markers[c.id].openPopup();} };
 list.appendChild(div);
 });
@@ -633,7 +1009,7 @@ c.innerHTML='';
 all.forEach((url,idx)=>{
 const isEx=idx<fotosExistentes.length;
 const d=document.createElement('div'); d.className='foto-thumb';
-const img=document.createElement('img'); img.src=url; img.style.cssText='width:100%;height:100%;object-fit:cover';
+const img=document.createElement('img'); img.src=url;
 const btn=document.createElement('button'); btn.className='remove-foto'; btn.innerHTML='&times;';
 btn.onclick=function(){removeFoto(idx,url,isEx);};
 d.appendChild(img); d.appendChild(btn); c.appendChild(d);
@@ -689,8 +1065,8 @@ const c=allClientes.find(x=>x.id===id); if(!c) return;
 const fotos=c.fotos||[];
 document.getElementById('galeria-titulo').textContent='Fotos: '+(c.nombre||'');
 const grid=document.getElementById('galeria-grid');
-if(fotos.length===0){grid.innerHTML='<div class="galeria-empty">&#128247; No hay fotos.<br><small>Editala para agregar fotos.</small></div>';}
-else{grid.innerHTML='';fotos.forEach((url,i)=>{const d=document.createElement('div');d.className='galeria-item';d.onclick=()=>openLightbox(url);d.innerHTML='<img src="'+url+'" loading="lazy">';grid.appendChild(d);});}
+if(fotos.length===0){grid.innerHTML='<div class="galeria-empty">&#128247; No hay fotos.</div>';}
+else{grid.innerHTML='';fotos.forEach(url=>{const d=document.createElement('div');d.className='galeria-item';d.onclick=()=>openLightbox(url);d.innerHTML='<img src="'+url+'" loading="lazy">';grid.appendChild(d);});}
 document.getElementById('galeria-modal').classList.add('active');
 map.closePopup();
 }
@@ -700,16 +1076,205 @@ function openLightbox(url){document.getElementById('lightbox-img').src=url;docum
 function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.getElementById('lightbox-img').src='';}
 function showLoading(s){document.getElementById('loading').style.display=s?'block':'none';}
 
-document.addEventListener('DOMContentLoaded',function(){
-document.getElementById('filter-subcategoria').addEventListener('change',onFilterSubcategoriaChange);
+// ===== FACTURACION =====
+function populateFactClienteSelect() {
+const sel = document.getElementById('fact-cliente-id');
+if (!sel) return;
+const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor').sort((a,b) => a.nombre.localeCompare(b.nombre));
+const current = sel.value;
+sel.innerHTML = '<option value="">-- Seleccionar distribuidor --</option>';
+distribuidores.forEach(d => {
+const o = document.createElement('option');
+o.value = d.id; o.textContent = d.nombre;
+sel.appendChild(o);
+});
+if (current) sel.value = current;
+}
+
+function openFacturacionModal() {
+populateFactClienteSelect();
+loadFacturacionList();
+renderRanking();
+document.getElementById('facturacion-overlay').classList.add('active');
+}
+
+function closeFacturacionModal() {
+document.getElementById('facturacion-overlay').classList.remove('active');
+}
+
+function loadClienteFactTab(clienteId) {
+switchFTab('cargar', document.querySelector('.ftab'));
+const sel = document.getElementById('fact-cliente-id');
+if (sel) sel.value = clienteId;
+}
+
+function switchFTab(tab, el) {
+document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.ftab-content').forEach(t => t.classList.remove('active'));
+if (el) el.classList.add('active');
+else {
+const tabs = document.querySelectorAll('.ftab');
+tabs.forEach(t => { if(t.getAttribute('onclick') && t.getAttribute('onclick').includes(tab)) t.classList.add('active'); });
+}
+const el2 = document.getElementById('ftab-'+tab);
+if (el2) el2.classList.add('active');
+if (tab === 'lista') loadFacturacionList();
+if (tab === 'ranking') renderRanking();
+}
+
+async function saveFacturacion() {
+const clienteId = document.getElementById('fact-cliente-id').value;
+const monto = parseFloat(document.getElementById('fact-monto').value);
+const anio = parseInt(document.getElementById('fact-anio').value);
+const mesDesde = parseInt(document.getElementById('fact-mes-desde').value);
+const mesHasta = parseInt(document.getElementById('fact-mes-hasta').value);
+const notas = document.getElementById('fact-notas').value;
+
+if (!clienteId) { alert('Seleccione un distribuidor'); return; }
+if (!monto || monto <= 0) { alert('Ingrese un monto válido'); return; }
+if (mesDesde > mesHasta) { alert('El mes desde no puede ser mayor al mes hasta'); return; }
+
+showLoading(true);
+try {
+const { error } = await db.from('facturacion').insert({
+cliente_id: parseInt(clienteId),
+monto, anio, mes_desde: mesDesde, mes_hasta: mesHasta,
+notas: notas || null
+});
+if (error) throw error;
+document.getElementById('fact-success').style.display = 'block';
+setTimeout(() => { document.getElementById('fact-success').style.display = 'none'; }, 3000);
+document.getElementById('fact-monto').value = '';
+document.getElementById('fact-notas').value = '';
+await loadFacturacion();
+} catch(e) {
+alert('Error al guardar: ' + e.message + '\n\nAsegurate de que la tabla facturacion exista en Supabase.');
+}
+showLoading(false);
+}
+
+async function loadFacturacionList() {
+try {
+const { data, error } = await db.from('facturacion').select('*, clientes(nombre)').order('anio', { ascending: false }).order('id', { ascending: false });
+if (error) throw error;
+allFacturacion = data || [];
+const tbody = document.getElementById('facturacion-tbody');
+if (!tbody) return;
+if (allFacturacion.length === 0) {
+tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">No hay registros cargados aún</td></tr>';
+return;
+}
+const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+tbody.innerHTML = allFacturacion.map(f => {
+const nombre = f.clientes ? f.clientes.nombre : 'ID:'+f.cliente_id;
+const periodo = MESES[f.mes_desde]+' - '+MESES[f.mes_hasta]+' '+f.anio;
+return '<tr><td><strong>'+nombre+'</strong></td><td>'+periodo+'</td><td class="fact-amount">'+fmtMoneyFull(f.monto)+'</td><td style="font-size:0.8em;color:#888">'+(f.notas||'')+'</td><td><button class="fact-del-btn" onclick="deleteFacturacion('+f.id+')">&#128465;</button></td></tr>';
+}).join('');
+updateKPIs();
+renderTop5();
+} catch(e) {
+const tbody = document.getElementById('facturacion-tbody');
+if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="color:#dc3545;padding:10px;font-size:0.82em">Error: '+e.message+'<br><small>Puede que necesites crear la tabla facturacion en Supabase.</small></td></tr>';
+}
+}
+
+async function deleteFacturacion(id) {
+if (!confirm('Eliminar este registro de facturación?')) return;
+showLoading(true);
+try {
+const { error } = await db.from('facturacion').delete().eq('id', id);
+if (error) throw error;
+await loadFacturacionList();
+} catch(e) { alert('Error: ' + e.message); }
+showLoading(false);
+}
+
+function renderRanking() {
+const anio = parseInt(document.getElementById('rank-anio')?.value || 2025);
+const periodo = document.getElementById('rank-periodo')?.value || '1-4';
+const parts = periodo.split('-');
+const desde = parseInt(parts[0]), hasta = parseInt(parts[1]);
+const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor');
+const ranking = distribuidores.map(d => ({
+nombre: d.nombre,
+monto: getFacturadoForCliente(d.id, anio, desde, hasta)
+})).filter(d => d.monto > 0).sort((a,b) => b.monto - a.monto);
+const total = ranking.reduce((s,d) => s+d.monto, 0);
+const tbody = document.getElementById('ranking-tbody');
+if (!tbody) return;
+if (ranking.length === 0) {
+tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Sin datos para este período</td></tr>';
+return;
+}
+tbody.innerHTML = ranking.map((d,i) => {
+const pct = total > 0 ? ((d.monto/total)*100).toFixed(1) : '0';
+const medal = i===0?'&#129351;':i===1?'&#129352;':i===2?'&#129353;':(i+1)+'.';
+return '<tr><td>'+medal+'</td><td><strong>'+d.nombre+'</strong></td><td class="fact-amount">'+fmtMoneyFull(d.monto)+'</td><td><div style="display:flex;align-items:center;gap:6px"><div style="background:#e8f5e9;border-radius:4px;overflow:hidden;width:60px;height:8px"><div style="background:#28a745;width:'+pct+'%;height:100%"></div></div><span style="font-size:0.75em;color:#888">'+pct+'%</span></div></td></tr>';
+}).join('');
+}
+
+function handleCSVImport(event) {
+const file = event.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function(e) {
+const text = e.target.result;
+const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+csvParsedData = [];
+const preview = [];
+lines.forEach((line, idx) => {
+if (idx === 0 && line.toLowerCase().includes('nombre')) return;
+const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
+if (parts.length >= 4) {
+csvParsedData.push({
+nombre: parts[0], monto: parseFloat(parts[1])||0,
+anio: parseInt(parts[2])||2025, mes_desde: parseInt(parts[3])||1,
+mes_hasta: parseInt(parts[4])||parseInt(parts[3])||1,
+notas: parts[5]||''
+});
+preview.push('<tr><td>'+parts[0]+'</td><td>'+fmtMoneyFull(parseFloat(parts[1])||0)+'</td><td>'+parts[2]+'</td><td>'+parts[3]+'-'+parts[4]+'</td></tr>');
+}
+});
+document.getElementById('csv-preview').style.display = 'block';
+document.getElementById('csv-preview-table').innerHTML = '<table class="facturacion-table"><thead><tr><th>Nombre</th><th>Monto</th><th>Año</th><th>Período</th></tr></thead><tbody>'+preview.join('')+'</tbody></table><div style="font-size:0.8em;color:#666;margin-top:6px">'+csvParsedData.length+' registros listos para importar</div>';
+};
+reader.readAsText(file);
+}
+
+async function importCSVData() {
+if (!csvParsedData.length) return;
+showLoading(true);
+let ok = 0, err = 0;
+for (const row of csvParsedData) {
+const cliente = allClientes.find(c => c.nombre.toLowerCase().trim() === row.nombre.toLowerCase().trim());
+if (!cliente) { err++; continue; }
+const { error } = await db.from('facturacion').insert({
+cliente_id: cliente.id, monto: row.monto, anio: row.anio,
+mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas||null
+});
+if (error) err++; else ok++;
+}
+showLoading(false);
+alert('Importación completada:\n\u2705 '+ok+' registros importados\n\u274C '+err+' registros con error (nombre no encontrado)');
+document.getElementById('csv-preview').style.display = 'none';
+document.getElementById('csv-input').value = '';
+csvParsedData = [];
+await loadFacturacion();
+loadFacturacionList();
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function() {
+document.getElementById('filter-subcategoria').addEventListener('change', onFilterSubcategoriaChange);
 });
 
 initMap();
-loadClientes();
+loadClientes().then(() => loadFacturacion());
 
-document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-document.getElementById('galeria-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeGaleria();});
-document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===e.currentTarget)closeLightbox();});
+document.getElementById('modal-overlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
+document.getElementById('facturacion-overlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeFacturacionModal(); });
+document.getElementById('galeria-modal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeGaleria(); });
+document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeLightbox(); });
 </script>
 </body>
 </html>
