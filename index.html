@@ -482,9 +482,10 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 
 <!-- TAB: LISTA -->
 <div class="ftab-content" id="ftab-lista">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-<span style="font-size:0.85em;color:#666">Registros de facturación cargados</span>
-<button onclick="loadFacturacionList()" style="background:#f0f2f5;border:1px solid #ddd;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#8635; Actualizar</button>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+<span id="fact-list-title" style="font-size:0.85em;color:#666">Registros de facturación cargados</span>
+<div style="display:flex;gap:6px"><button id="btn-ver-todos-fact" onclick="window._factClienteId=null;loadFacturacionList(null)" style="display:none;background:#e3f2fd;border:1px solid #90caf9;color:#1565c0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#128203; Ver todos</button>
+<button onclick="loadFacturacionList(window._factClienteId||null)" style="background:#f0f2f5;border:1px solid #ddd;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#8635; Actualizar</button></div>
 </div>
 <div id="facturacion-list-container">
 <table class="facturacion-table">
@@ -610,7 +611,7 @@ showLoading(false);
 
 async function loadFacturacion() {
 try {
-const { data, error } = await db.from('facturacion').select('*').order('anio', { ascending: false });
+const { data, error } = await db.from('facturacion').select('*').order('anio', { ascending: false }).limit(10000);
 if (error) {
 console.warn('Tabla facturacion no existe aun:', e.message);
 allFacturacion = [];
@@ -793,7 +794,7 @@ const fotosBtn = (c.tipo==='Obra') ? '<button class="btn-popup orange" onclick="
 const catInfo = (c.tipo==='Obra' && c.categoria) ? '<p>'+c.categoria+(c.subcategoria?' / '+c.subcategoria:'')+(c.producto?' / '+c.producto:'')+'</p>' : '';
 const ventaAmt = (c.tipo==='Distribuidor') ? getFacturadoForCliente(c.id, anio, desde, hasta) : 0;
 const ventasBlock = ventaAmt > 0 ? '<div class="popup-ventas"><div class="v-amount">'+fmtMoneyFull(ventaAmt)+'</div><div class="v-period">Ventas '+anio+' (meses '+desde+'-'+hasta+')</div></div>' : '';
-m.bindPopup('<div class="popup-content"><h3>'+(c.nombre||'')+fotosBadge+'</h3><p>Tipo: <strong>'+(c.tipo||'-')+'</strong>'+zona+'</p>'+catInfo+'<p>'+(c.direccion||'Sin direccion')+'</p>'+(c.telefono?'<p>Tel: '+c.telefono+'</p>':'')+(c.email?'<p>Email: '+c.email+'</p>':'')+(c.notas?'<p>'+c.notas+'</p>':'')+ventasBlock+fotosBtn+'<button class="btn-popup green" onclick="openFacturacionModal();loadClienteFactTab('+c.id+')">&#128190; Ver Facturación</button><button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup red" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
+m.bindPopup('<div class="popup-content"><h3>'+(c.nombre||'')+fotosBadge+'</h3><p>Tipo: <strong>'+(c.tipo||'-')+'</strong>'+zona+'</p>'+catInfo+'<p>'+(c.direccion||'Sin direccion')+'</p>'+(c.telefono?'<p>Tel: '+c.telefono+'</p>':'')+(c.email?'<p>Email: '+c.email+'</p>':'')+(c.notas?'<p>'+c.notas+'</p>':'')+ventasBlock+fotosBtn+'<button class="btn-popup green" onclick="openFacturacionModal('+c.id+')">&#128190; Ver Facturación</button><button class="btn-popup" onclick="editCliente('+c.id+')">Editar</button><button class="btn-popup red" onclick="deleteCliente('+c.id+')">Eliminar</button></div>');
 m.addTo(map); markers[c.id] = m;
 });
 renderList(filtered);
@@ -1068,8 +1069,9 @@ sel.appendChild(o);
 if (current) sel.value = current;
 }
 
-function openFacturacionModal() {
-  loadFacturacionList();
+function openFacturacionModal(clienteId) {
+  window._factClienteId = clienteId || null;
+  loadFacturacionList(clienteId || null);
   renderRanking();
   // Abrir siempre en la pestaña de carga de Excel
   const tabs = document.querySelectorAll('.ftab');
@@ -1083,7 +1085,8 @@ function openFacturacionModal() {
 }
 
 function closeFacturacionModal() {
-document.getElementById('facturacion-overlay').classList.remove('active');
+  document.getElementById('facturacion-overlay').classList.remove('active');
+  window._factClienteId = null;
 }
 
 function loadClienteFactTab(clienteId) {
@@ -1102,7 +1105,7 @@ tabs.forEach(t => { if(t.getAttribute('onclick') && t.getAttribute('onclick').in
 }
 const el2 = document.getElementById('ftab-'+tab);
 if (el2) el2.classList.add('active');
-if (tab === 'lista') loadFacturacionList();
+if (tab === 'lista') loadFacturacionList(window._factClienteId || null);
 if (tab === 'ranking') renderRanking();
 }
 
@@ -1139,14 +1142,26 @@ try {
 }
 showLoading(false);
 }
-async function loadFacturacionList() {
+async function loadFacturacionList(filterClienteId) {
 try {
-const { data, error } = await db.from('facturacion').select('*, clientes(nombre)').order('anio', { ascending: false }).order('id', { ascending: false });
+let query = db.from('facturacion').select('*, clientes(nombre)').order('anio', { ascending: false }).order('id', { ascending: false }).limit(10000);
+if (filterClienteId) query = query.eq('cliente_id', filterClienteId);
+const { data, error } = await query;
 if (error) throw error;
 allFacturacion = data || [];
 const tbody = document.getElementById('facturacion-tbody');
 if (!tbody) return;
-if (allFacturacion.length === 0) {
+    const titleEl = document.getElementById('fact-list-title');
+    const btnVerTodos = document.getElementById('btn-ver-todos-fact');
+    if (filterClienteId) {
+      const cl = allClientes.find(c => c.id === filterClienteId);
+      if (titleEl) titleEl.textContent = 'Registros de: ' + (cl ? cl.nombre : 'Distribuidor');
+      if (btnVerTodos) btnVerTodos.style.display = '';
+    } else {
+      if (titleEl) titleEl.textContent = 'Todos los registros de facturación';
+      if (btnVerTodos) btnVerTodos.style.display = 'none';
+    }
+    if (allFacturacion.length === 0) {
 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">No hay registros cargados aún</td></tr>';
 return;
 }
@@ -1210,15 +1225,21 @@ function handleFileImport(event) {
   const reader = new FileReader();
 
   function parseUSD(val) {
-    if (!val && val !== 0) return 0;
-    const str = String(val).trim();
-    const clean = str.replace(/^USD\s*/i, '').trim();
-    const isNeg = clean.startsWith('(') && clean.endsWith(')');
-    const abs = clean.replace(/[()]/g, '');
-    const num = abs.replace(/\./g, '').replace(',', '.');
-    const result = parseFloat(num) || 0;
-    return isNeg ? -result : result;
-  }
+        if (!val && val !== 0) return 0;
+        if (typeof val === 'number') return val;
+        const str = String(val).trim();
+        const clean = str.replace(/^USD\s*/i, '').trim();
+        const isNeg = clean.startsWith('(') && clean.endsWith(')');
+        const abs = clean.replace(/[()]/g, '').trim();
+        const lastDot = abs.lastIndexOf('.');
+        const lastComma = abs.lastIndexOf(',');
+        let num;
+        if (lastDot > lastComma) { num = abs.replace(/,/g, ''); }
+        else if (lastComma > lastDot) { num = abs.replace(/\./g, '').replace(',', '.'); }
+        else { num = abs; }
+        const result = parseFloat(num) || 0;
+        return isNeg ? -result : result;
+      }
 
   function parsePeriodo(val) {
     const s = String(val).trim().replace(/[^0-9]/g, '');
@@ -1313,13 +1334,18 @@ async function importCSVData() {
   if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
   showLoading(true);
   let ok = 0, skipped = 0, notInMap = [];
+  const toInsert = [];
   for (const row of csvParsedData) {
     const cliente = allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, row.nombre));
     if (!cliente) { skipped++; notInMap.push(row.nombre); continue; }
-    const payload = { cliente_id: cliente.id, monto: row.monto, anio: row.anio, mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas || null, canal: row.canal || null };
-    const { error } = await db.from('facturacion').insert(payload);
-    if (error) { console.error(error); skipped++; }
-    else ok++;
+    toInsert.push({ cliente_id: cliente.id, monto: row.monto, anio: row.anio, mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas || null, canal: row.canal || null });
+  }
+  const BATCH_SIZE = 500;
+  for (let b = 0; b < toInsert.length; b += BATCH_SIZE) {
+    const batch = toInsert.slice(b, b + BATCH_SIZE);
+    const { error } = await db.from('facturacion').insert(batch);
+    if (error) { console.error('Batch error:', error); skipped += batch.length; }
+    else ok += batch.length;
   }
   showLoading(false);
   document.getElementById('csv-preview').style.display = 'none';
