@@ -444,140 +444,76 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 <!-- MODAL FACTURACION -->
 <div class="modal-overlay" id="facturacion-overlay">
 <div class="modal" style="max-width:700px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <h2 style="margin-bottom:0">&#128190; Gestión de Facturación</h2>
-    <button onclick="closeFacturacionModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666">&times;</button>
-  </div>
-  <div class="facturacion-tabs">
-    <button class="ftab active" onclick="switchFTab('cargar',this)">&#128190; Cargar Datos</button>
-    <button class="ftab" onclick="switchFTab('lista',this)">&#128203; Ver Registros</button>
-    <button class="ftab" onclick="switchFTab('ranking',this)">&#127941; Ranking</button>
-    <button class="ftab" onclick="switchFTab('importar',this)">&#128196; Importar CSV</button>
-  </div>
-
-  <!-- TAB: CARGAR -->
-  <div class="ftab-content active" id="ftab-cargar">
-    <div class="alert-info">Ingrese los datos de facturación de un distribuidor para el período seleccionado.</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Distribuidor *</label>
-        <select id="fact-cliente-id">
-          <option value="">-- Seleccionar --</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Monto ($) *</label>
-        <input type="number" id="fact-monto" placeholder="1250000" step="1000" min="0">
-      </div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group">
-        <label>Año *</label>
-        <select id="fact-anio">
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Mes desde *</label>
-        <select id="fact-mes-desde">
-          <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
-          <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
-          <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
-          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Mes hasta *</label>
-        <select id="fact-mes-hasta">
-          <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
-          <option value="4" selected>Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
-          <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
-          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Notas (opcional)</label><input type="text" id="fact-notas" placeholder="Observaciones adicionales..."></div>
-      <div class="form-group"><label>Canal de Venta</label>
-        <select id="fact-canal">
-          <option value="">-- Sin especificar --</option>
-          <option value="distribuidor">Venta Directa Distribuidor</option>
-          <option value="hd">Venta Directa Hunter Douglas</option>
-        </select>
-      </div>
-    </div></div>
-    <div class="alert-success" id="fact-success">&#10003; Registro guardado correctamente!</div>
-    <button class="btn-success" onclick="saveFacturacion()">&#128190; Guardar Registro</button>
-  </div>
-
-  <!-- TAB: LISTA -->
-  <div class="ftab-content" id="ftab-lista">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <span style="font-size:0.85em;color:#666">Registros de facturación cargados</span>
-      <button onclick="loadFacturacionList()" style="background:#f0f2f5;border:1px solid #ddd;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#8635; Actualizar</button>
-    </div>
-    <div id="facturacion-list-container">
-      <table class="facturacion-table">
-        <thead><tr><th>Distribuidor</th><th>Período</th><th>USD</th><th>Canal</th><th></th></tr></thead>
-        <tbody id="facturacion-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TAB: RANKING -->
-  <div class="ftab-content" id="ftab-ranking">
-    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
-      <select id="rank-anio" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
-        <option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option>
-      </select>
-      <select id="rank-periodo" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
-        <option value="1-4">Ene-Abr</option>
-        <option value="1-6">Ene-Jun</option>
-        <option value="1-12">Año completo</option>
-      </select>
-    </div>
-    <table class="facturacion-table">
-      <thead><tr><th>#</th><th>Distribuidor</th><th>Ventas</th><th>% Total</th></tr></thead>
-      <tbody id="ranking-tbody"></tbody>
-    </table>
-  </div>
-
-  <!-- TAB: IMPORTAR CSV -->
-  <div class="ftab-content" id="ftab-importar">
-    <div class="alert-info">
-      <strong>&#128196; Formato esperado del archivo Excel/CSV:</strong>
-      <table style="margin-top:8px;font-size:0.82em;width:100%;border-collapse:collapse">
-        <tr style="background:rgba(25,118,210,0.1)">
-          <th style="padding:4px 8px;text-align:left">Columna</th>
-          <th style="padding:4px 8px;text-align:left">Contenido</th>
-          <th style="padding:4px 8px;text-align:left">Ejemplo</th>
-        </tr>
-        <tr><td style="padding:3px 8px"><strong>Facturacion</strong></td><td>Monto en USD</td><td style="color:#1976d2">USD 4.226,36</td></tr>
-        <tr><td style="padding:3px 8px"><strong>Directa o Distribuidor</strong></td><td>NP = Dist. | NO = HD</td><td><span style="background:#e8f5e9;color:#28a745;padding:1px 5px;border-radius:4px">NP</span> <span style="background:#e3f2fd;color:#1976d2;padding:1px 5px;border-radius:4px">NO</span></td></tr>
-        <tr><td style="padding:3px 8px"><strong>Año</strong></td><td>Año de la venta</td><td>2025</td></tr>
-        <tr><td style="padding:3px 8px"><strong>Periodo</strong></td><td>Formato AAAAMM</td><td>202504 = Abr 2025</td></tr>
-        <tr><td style="padding:3px 8px"><strong>Distribuidor</strong></td><td>Nombre del distribuidor</td><td>ALKIMYA SA</td></tr>
-      </table>
-      <div style="margin-top:8px;font-size:0.78em;color:#555">&#8505; Los distribuidores que no estén cargados en el mapa quedan pendientes y se vinculan automáticamente cuando los agregues.</div>
-    </div>
-    <div class="import-zone" onclick="document.getElementById('excel-input').click()">
-      <div style="font-size:2em">&#128196;</div>
-      <p><strong>Hacer clic para seleccionar archivo</strong></p>
-      <p style="font-size:0.75em;color:#888">Excel (.xlsx / .xls) o CSV (.csv)</p>
-    </div>
-    <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileImport(event)">
-    <div id="csv-preview" style="display:none">
-      <div style="font-size:0.82em;margin-bottom:8px;color:#555">Vista previa:</div>
-      <div id="csv-preview-table"></div>
-      <button class="btn-success" onclick="importCSVData()" style="margin-top:10px">&#128190; Importar Datos</button>
-    </div>
-  </div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+<h2 style="margin-bottom:0">&#128190; Gestión de Facturación</h2>
+<button onclick="closeFacturacionModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666">&times;</button>
 </div>
+<div class="facturacion-tabs">
+<button class="ftab active" onclick="switchFTab('importar',this)">&#128196; Cargar Excel</button>
+<button class="ftab" onclick="switchFTab('lista',this)">&#128203; Ver Registros</button>
+<button class="ftab" onclick="switchFTab('ranking',this)">&#127941; Ranking</button>
+</div>
+
+<!-- TAB: CARGAR EXCEL (pantalla principal) -->
+<div class="ftab-content active" id="ftab-importar">
+<div class="alert-info" style="margin-bottom:14px">
+<strong>&#128196; Formato del archivo Excel:</strong> Columna A = Monto, B = Código (NP=Distribuidor / NO=Hunter Douglas / NADA=ignorar), C = Año, D = Período (AAAAMM), E = Nombre del Distribuidor.<br>
+<span style="font-size:0.78em;color:#555">Los distribuidores se vinculan automáticamente por nombre con los cargados en el mapa.</span>
+</div>
+<div class="import-zone" id="import-drop-zone" onclick="document.getElementById('excel-input').click()">
+<div style="font-size:2.5em">&#128196;</div>
+<p><strong>Hacer clic para seleccionar el archivo Excel</strong></p>
+<p style="font-size:0.75em;color:#888">Excel (.xlsx / .xls) o CSV (.csv)</p>
+</div>
+<input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileImport(event)">
+<div id="csv-preview" style="display:none">
+<div id="csv-preview-table"></div>
+<div id="import-summary" style="font-size:0.82em;color:#555;margin-top:8px;background:#f0f2f5;padding:8px;border-radius:6px;"></div>
+<button class="btn-success" onclick="importCSVData()" style="margin-top:10px">&#128190; Importar Todos los Registros</button>
+<button class="btn-secondary" onclick="resetImport()" style="margin-top:5px">&#10006; Cancelar y volver</button>
+</div>
+<div id="import-done" style="display:none;text-align:center;padding:20px">
+<div style="font-size:3em">&#9989;</div>
+<p style="color:#28a745;font-weight:700;font-size:1.1em">&#161;Importaci&#243;n completada!</p>
+<div id="import-done-summary" style="font-size:0.85em;color:#555;margin-top:8px;"></div>
+<button class="btn-primary" onclick="resetImport()" style="margin-top:14px">&#128196; Cargar otro archivo</button>
 </div>
 </div>
 
+<!-- TAB: LISTA -->
+<div class="ftab-content" id="ftab-lista">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<span style="font-size:0.85em;color:#666">Registros de facturación cargados</span>
+<button onclick="loadFacturacionList()" style="background:#f0f2f5;border:1px solid #ddd;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.78em">&#8635; Actualizar</button>
+</div>
+<div id="facturacion-list-container">
+<table class="facturacion-table">
+<thead><tr><th>Distribuidor</th><th>Período</th><th>USD</th><th>Canal</th><th></th></tr></thead>
+<tbody id="facturacion-tbody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- TAB: RANKING -->
+<div class="ftab-content" id="ftab-ranking">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+<select id="rank-anio" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
+<option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option>
+</select>
+<select id="rank-periodo" onchange="renderRanking()" style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:0.82em">
+<option value="1-4">Ene-Abr</option>
+<option value="1-6">Ene-Jun</option>
+<option value="1-12">Año completo</option>
+</select>
+</div>
+<table class="facturacion-table">
+<thead><tr><th>#</th><th>Distribuidor</th><th>Ventas</th><th>% Total</th></tr></thead>
+<tbody id="ranking-tbody"></tbody>
+</table>
+</div>
+
+</div>
+</div>
 <div id="galeria-modal">
 <div class="galeria-container">
   <button class="galeria-close" onclick="closeGaleria()">&times;</button>
@@ -1133,10 +1069,17 @@ if (current) sel.value = current;
 }
 
 function openFacturacionModal() {
-populateFactClienteSelect();
-loadFacturacionList();
-renderRanking();
-document.getElementById('facturacion-overlay').classList.add('active');
+  loadFacturacionList();
+  renderRanking();
+  // Abrir siempre en la pestaña de carga de Excel
+  const tabs = document.querySelectorAll('.ftab');
+  const contents = document.querySelectorAll('.ftab-content');
+  tabs.forEach(t => t.classList.remove('active'));
+  contents.forEach(c => c.classList.remove('active'));
+  if (tabs[0]) tabs[0].classList.add('active');
+  const importTab = document.getElementById('ftab-importar');
+  if (importTab) importTab.classList.add('active');
+  document.getElementById('facturacion-overlay').classList.add('active');
 }
 
 function closeFacturacionModal() {
@@ -1264,15 +1207,17 @@ return '<tr><td>'+medal+'</td><td><strong>'+d.nombre+'</strong></td><td class="f
 function handleFileImport(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
   const reader = new FileReader();
 
   function parseUSD(val) {
     if (!val && val !== 0) return 0;
     const str = String(val).trim();
     const clean = str.replace(/^USD\s*/i, '').trim();
-    const num = clean.replace(/\./g, '').replace(',', '.');
-    return parseFloat(num) || 0;
+    const isNeg = clean.startsWith('(') && clean.endsWith(')');
+    const abs = clean.replace(/[()]/g, '');
+    const num = abs.replace(/\./g, '').replace(',', '.');
+    const result = parseFloat(num) || 0;
+    return isNeg ? -result : result;
   }
 
   function parsePeriodo(val) {
@@ -1287,6 +1232,7 @@ function handleFileImport(event) {
 
   function parseCanal(val) {
     const s = String(val || '').trim().toUpperCase();
+    if (s === 'NADA' || s === '') return null;
     if (s.startsWith('NP')) return 'distribuidor';
     if (s.startsWith('NO')) return 'hd';
     return null;
@@ -1294,6 +1240,7 @@ function handleFileImport(event) {
 
   reader.onload = function(e) {
     let rows = [];
+    let ignoradas = 0;
     const data = new Uint8Array(e.target.result);
     const wb = XLSX.read(data, { type: 'array', cellText: true, cellDates: false });
     const sheetName = wb.SheetNames.find(n => n.toLowerCase() === 'filtrado') || wb.SheetNames[0];
@@ -1302,101 +1249,90 @@ function handleFileImport(event) {
     for (let i = 1; i < aoaData.length; i++) {
       const row = aoaData[i];
       const facturacionRaw = row[0];
-      const proyectoIdRaw  = row[1];
-      const anioRaw        = row[2];
-      const periodoRaw     = row[3];
+      const proyectoIdRaw = row[1];
+      const anioRaw = row[2];
+      const periodoRaw = row[3];
       const distribuidorRaw = row[4];
       const nombre = String(distribuidorRaw || '').trim();
-      if (!nombre) continue;
+      const codigoB = String(proyectoIdRaw || '').trim().toUpperCase();
+      if (!nombre || codigoB === 'NADA') { ignoradas++; continue; }
+      const canal = parseCanal(proyectoIdRaw);
+      if (!canal) { ignoradas++; continue; }
       const monto = parseUSD(facturacionRaw);
-      if (!monto || monto <= 0) continue;
+      if (!monto || monto <= 0) { ignoradas++; continue; }
       const periodo = parsePeriodo(periodoRaw);
       const anio = (String(anioRaw).trim().length === 4) ? parseInt(anioRaw) : periodo.anio;
-      const canal = parseCanal(proyectoIdRaw);
       rows.push({ nombre, monto, anio: anio || periodo.anio, mes_desde: periodo.mes, mes_hasta: periodo.mes, canal, notas: '' });
     }
     csvParsedData = rows;
+    const matches = rows.filter(r => allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, r.nombre)));
+    const noMatch = [...new Set(rows.filter(r => !allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, r.nombre))).map(r => r.nombre))];
     const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const preview = rows.slice(0, 20).map(r =>
-      '<tr><td><strong>' + r.nombre + '</strong></td>' +
-      '<td style="color:#1976d2;font-weight:600">USD ' + r.monto.toFixed(2) + '</td>' +
-      '<td>' + r.anio + '</td><td>' + (MESES[r.mes_desde] || r.mes_desde) + '</td>' +
-      '<td><span style="background:' + (r.canal==='distribuidor'?'#e8f5e9;color:#28a745':'#e3f2fd;color:#1976d2') + ';padding:2px 7px;border-radius:10px;font-size:0.8em">' +
-      (r.canal==='distribuidor'?'NP - Dist.':'NO - HD') + '</span></td></tr>'
-    );
-    const moreRows = rows.length > 20 ? '<tr><td colspan="5" style="text-align:center;color:#888;font-size:0.8em">... y ' + (rows.length-20) + ' registros m\u00e1s</td></tr>' : '';
+    const preview = rows.slice(0, 25).map(r => {
+      const clienteMatch = allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, r.nombre));
+      const matchIcon = clienteMatch ? '<span style="color:#28a745">&#10003;</span>' : '<span style="color:#dc3545">&#10007;</span>';
+      return '<tr>' +
+        '<td>' + matchIcon + ' <strong>' + r.nombre + '</strong></td>' +
+        '<td style="color:#1976d2;font-weight:600">USD ' + r.monto.toFixed(2) + '</td>' +
+        '<td>' + r.anio + '</td><td>' + (MESES[r.mes_desde] || r.mes_desde) + '</td>' +
+        '<td><span style="background:' + (r.canal==='distribuidor'?'#e8f5e9;color:#28a745':'#e3f2fd;color:#1976d2') + ';padding:2px 7px;border-radius:10px;font-size:0.8em">' +
+        (r.canal==='distribuidor'?'NP - Dist.':'NO - HD') + '</span></td></tr>';
+    });
+    const moreRows = rows.length > 25 ? '<tr><td colspan="5" style="text-align:center;color:#888;font-size:0.8em">... y ' + (rows.length-25) + ' registros más</td></tr>' : '';
     document.getElementById('csv-preview').style.display = 'block';
+    document.getElementById('import-drop-zone').style.display = 'none';
     document.getElementById('csv-preview-table').innerHTML =
-      '<table class="facturacion-table"><thead><tr><th>Distribuidor</th><th>USD</th><th>A\u00f1o</th><th>Mes</th><th>Canal</th></tr></thead><tbody>' +
-      preview.join('') + moreRows + '</tbody></table>' +
-      '<div style="font-size:0.82em;color:#555;margin-top:8px;background:#f0f2f5;padding:8px;border-radius:6px;">' +
-      '<strong>' + rows.length + '</strong> registros listos | ' +
-      '<strong>' + rows.filter(r=>r.canal==='distribuidor').length + '</strong> NP (Dist.) | ' +
-      '<strong>' + rows.filter(r=>r.canal==='hd').length + '</strong> NO (HD)</div>';
+      '<table class="facturacion-table"><thead><tr><th>Distribuidor</th><th>USD</th><th>Año</th><th>Mes</th><th>Canal</th></tr></thead><tbody>' +
+      preview.join('') + moreRows + '</tbody></table>';
+    document.getElementById('import-summary').innerHTML =
+      '<strong>' + rows.length + '</strong> registros &nbsp;|&nbsp; ' +
+      '<span style="color:#28a745"><strong>' + matches.length + '</strong> con match en el mapa</span> &nbsp;|&nbsp; ' +
+      '<span style="color:#888"><strong>' + rows.filter(r=>r.canal==='distribuidor').length + '</strong> NP</span> &nbsp;|&nbsp; ' +
+      '<span style="color:#1976d2"><strong>' + rows.filter(r=>r.canal==='hd').length + '</strong> NO</span>' +
+      (ignoradas > 0 ? ' &nbsp;|&nbsp; <span style="color:#aaa">' + ignoradas + ' ignoradas</span>' : '') +
+      (noMatch.length > 0 ? '<br><span style="color:#dc3545;font-size:0.88em">&#9888; Sin match: ' + noMatch.slice(0,6).join(', ') + (noMatch.length>6?' ...':'') + '</span>' : '');
   };
   reader.readAsArrayBuffer(file);
 }
 
+function matchNombre(mapaNombre, excelNombre) {
+  const a = (mapaNombre || '').toLowerCase().trim();
+  const b = (excelNombre || '').toLowerCase().trim();
+  return a === b || a.includes(b) || b.includes(a);
+}
+
+function resetImport() {
+  csvParsedData = [];
+  document.getElementById('csv-preview').style.display = 'none';
+  document.getElementById('import-done').style.display = 'none';
+  document.getElementById('import-drop-zone').style.display = '';
+  document.getElementById('excel-input').value = '';
+}
+
 async function importCSVData() {
-if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
-showLoading(true);
-let ok = 0, skipped = 0, notInMap = [];
-
-for (const row of csvParsedData) {
-  // Match distribuidor by name (flexible: ignore case, extra spaces)
-  const normalName = row.nombre.toLowerCase().trim();
-  const cliente = allClientes.find(c =>
-    c.nombre.toLowerCase().trim() === normalName ||
-    c.nombre.toLowerCase().trim().includes(normalName) ||
-    normalName.includes(c.nombre.toLowerCase().trim())
-  );
-
-  let clienteId = null;
-  if (cliente) {
-    clienteId = cliente.id;
-  } else {
-    // Distribuidor no esta en el mapa todavia - guardar con cliente_id_pending
-    // Lo guardamos con un registro especial sin cliente_id (null)
-    // y guardamos el nombre en notas para poder vincularlo luego
-    notInMap.push(row.nombre);
-    // Still insert but we need a valid cliente_id - skip for now, store as pending
-    // We'll insert into a pending table or skip
-    skipped++;
-    continue;
+  if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
+  showLoading(true);
+  let ok = 0, skipped = 0, notInMap = [];
+  for (const row of csvParsedData) {
+    const cliente = allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, row.nombre));
+    if (!cliente) { skipped++; notInMap.push(row.nombre); continue; }
+    const payload = { cliente_id: cliente.id, monto: row.monto, anio: row.anio, mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas || null, canal: row.canal || null };
+    const { error } = await db.from('facturacion').insert(payload);
+    if (error) { console.error(error); skipped++; }
+    else ok++;
   }
-
-  const payload = {
-    cliente_id: clienteId,
-    monto: row.monto,
-    anio: row.anio,
-    mes_desde: row.mes_desde,
-    mes_hasta: row.mes_hasta,
-    notas: row.notas || null,
-    canal: row.canal || null
-  };
-
-  const { error } = await db.from('facturacion').insert(payload);
-  if (error) { console.error(error); skipped++; }
-  else ok++;
-}
-
-showLoading(false);
-
-const uniqueNotInMap = [...new Set(notInMap)];
-let msg = '\u2705 ' + ok + ' registros importados correctamente.';
-if (skipped > 0) msg += '\n\u23F3 ' + skipped + ' registros pendientes (distribuidores no cargados en el mapa todavia).';
-if (uniqueNotInMap.length > 0) {
-  msg += '\n\nDistribuidores pendientes (' + uniqueNotInMap.length + '):\n' + uniqueNotInMap.slice(0,10).join('\n');
-  if (uniqueNotInMap.length > 10) msg += '\n... y ' + (uniqueNotInMap.length-10) + ' mas.';
-  msg += '\n\nCuando los agregues al mapa, volvé a importar el archivo y se vincularán automaticamente.';
-}
-alert(msg);
-
-document.getElementById('csv-preview').style.display = 'none';
-document.getElementById('excel-input').value = '';
-csvParsedData = [];
-await loadFacturacion();
-loadFacturacionList();
+  showLoading(false);
+  document.getElementById('csv-preview').style.display = 'none';
+  document.getElementById('import-drop-zone').style.display = 'none';
+  document.getElementById('import-done').style.display = 'block';
+  const uniqueNotInMap = [...new Set(notInMap)];
+  let doneMsg = '<strong>' + ok + ' registros importados correctamente.</strong>';
+  if (uniqueNotInMap.length > 0) doneMsg += '<br><span style="color:#dc3545;font-size:0.85em">Sin match en mapa (' + uniqueNotInMap.length + '): ' + uniqueNotInMap.slice(0,8).join(', ') + (uniqueNotInMap.length>8?' ...':'') + '</span>';
+  document.getElementById('import-done-summary').innerHTML = doneMsg;
+  document.getElementById('excel-input').value = '';
+  csvParsedData = [];
+  await loadFacturacion();
+  loadFacturacionList();
 }
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
