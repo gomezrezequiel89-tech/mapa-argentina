@@ -1332,34 +1332,61 @@ function resetImport() {
 }
 
 async function importCSVData() {
-  if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
-  showLoading(true);
-  let ok = 0, skipped = 0, notInMap = [];
-  const toInsert = [];
-  for (const row of csvParsedData) {
-    const cliente = allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, row.nombre));
-    if (!cliente) { skipped++; notInMap.push(row.nombre); continue; }
-    toInsert.push({ cliente_id: cliente.id, monto: row.monto, anio: row.anio, mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas || null, canal: row.canal || null });
+if (!csvParsedData.length) { alert('No hay datos para importar'); return; }
+
+// Determinar el año/periodo que se va a importar
+const años = [...new Set(csvParsedData.map(r => r.anio))];
+const canales = [...new Set(csvParsedData.map(r => r.canal).filter(Boolean))];
+const meses = [...new Set(csvParsedData.map(r => r.mes_desde))];
+const mesMin = Math.min(...meses);
+const mesMax = Math.max(...meses);
+
+// Confirmar si hay datos existentes para ese período y preguntar si borrar
+let dedupeConfirm = false;
+for (const año of años) {
+  const existing = allFacturacion.filter(f => f.anio === año && f.mes_desde >= mesMin && f.mes_hasta <= mesMax);
+  if (existing.length > 0) {
+    dedupeConfirm = true;
+    break;
   }
-  const BATCH_SIZE = 500;
-  for (let b = 0; b < toInsert.length; b += BATCH_SIZE) {
-    const batch = toInsert.slice(b, b + BATCH_SIZE);
-    const { error } = await db.from('facturacion').insert(batch);
-    if (error) { console.error('Batch error:', error); skipped += batch.length; }
-    else ok += batch.length;
+}
+
+if (dedupeConfirm) {
+  const ok = confirm('Ya existen registros para este período. ¿Deseas eliminarlos y reemplazarlos? (Recomendado para evitar duplicados)');
+  if (ok) {
+    for (const año of años) {
+      await db.from('facturacion').delete().eq('anio', año).gte('mes_desde', mesMin).lte('mes_hasta', mesMax);
+    }
   }
-  showLoading(false);
-  document.getElementById('csv-preview').style.display = 'none';
-  document.getElementById('import-drop-zone').style.display = 'none';
-  document.getElementById('import-done').style.display = 'block';
-  const uniqueNotInMap = [...new Set(notInMap)];
-  let doneMsg = '<strong>' + ok + ' registros importados correctamente.</strong>';
-  if (uniqueNotInMap.length > 0) doneMsg += '<br><span style="color:#dc3545;font-size:0.85em">Sin match en mapa (' + uniqueNotInMap.length + '): ' + uniqueNotInMap.slice(0,8).join(', ') + (uniqueNotInMap.length>8?' ...':'') + '</span>';
-  document.getElementById('import-done-summary').innerHTML = doneMsg;
-  document.getElementById('excel-input').value = '';
-  csvParsedData = [];
-  await loadFacturacion();
-  loadFacturacionList();
+}
+
+showLoading(true);
+let ok = 0, skipped = 0, notInMap = [];
+const toInsert = [];
+for (const row of csvParsedData) {
+const cliente = allClientes.find(c => c.tipo === 'Distribuidor' && matchNombre(c.nombre, row.nombre));
+if (!cliente) { skipped++; notInMap.push(row.nombre); continue; }
+toInsert.push({ cliente_id: cliente.id, monto: row.monto, anio: row.anio, mes_desde: row.mes_desde, mes_hasta: row.mes_hasta, notas: row.notas || null, canal: row.canal || null });
+}
+const BATCH_SIZE = 500;
+for (let b = 0; b < toInsert.length; b += BATCH_SIZE) {
+const batch = toInsert.slice(b, b + BATCH_SIZE);
+const { error } = await db.from('facturacion').insert(batch);
+if (error) { console.error('Batch error:', error); skipped += batch.length; }
+else ok += batch.length;
+}
+showLoading(false);
+document.getElementById('csv-preview').style.display = 'none';
+document.getElementById('import-drop-zone').style.display = 'none';
+document.getElementById('import-done').style.display = 'block';
+const uniqueNotInMap = [...new Set(notInMap)];
+let doneMsg = '<strong>' + ok + ' registros importados correctamente.</strong>';
+if (uniqueNotInMap.length > 0) doneMsg += '<br><span style="color:#dc3545;font-size:0.85em">Sin match en mapa (' + uniqueNotInMap.length + '): ' + uniqueNotInMap.slice(0,8).join(', ') + (uniqueNotInMap.length>8?' ...':'') + '</span>';
+document.getElementById('import-done-summary').innerHTML = doneMsg;
+document.getElementById('excel-input').value = '';
+csvParsedData = [];
+await loadFacturacion();
+loadFacturacionList();
 }
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
