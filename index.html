@@ -1484,13 +1484,19 @@ function toggleLeftPanel() {
   if (leftPanelVisible) {
     sidebar.classList.remove('collapsed');
     btn.innerHTML = '&#9664;';
+    btn.style.position = 'absolute';
     btn.style.right = '-22px';
     btn.style.left = '';
+    btn.style.top = '';
+    btn.style.transform = '';
   } else {
     sidebar.classList.add('collapsed');
     btn.innerHTML = '&#9654;';
-    btn.style.right = '';
+    btn.style.position = 'fixed';
     btn.style.left = '0px';
+    btn.style.right = '';
+    btn.style.top = '50%';
+    btn.style.transform = 'translateY(-50%)';
   }
   if (map) setTimeout(() => map.invalidateSize(), 310);
 }
@@ -1503,14 +1509,20 @@ function toggleRightPanel() {
   if (rightPanelVisible) {
     panel.classList.remove('collapsed');
     btn.innerHTML = '&#9654;';
+    btn.style.position = 'absolute';
     btn.style.left = '-22px';
     btn.style.right = '';
+    btn.style.top = '';
+    btn.style.transform = '';
     if (fab) fab.style.right = '255px';
   } else {
     panel.classList.add('collapsed');
     btn.innerHTML = '&#9664;';
-    btn.style.left = '';
+    btn.style.position = 'fixed';
     btn.style.right = '0px';
+    btn.style.left = '';
+    btn.style.top = '50%';
+    btn.style.transform = 'translateY(-50%)';
     if (fab) fab.style.right = '10px';
   }
   if (map) setTimeout(() => map.invalidateSize(), 310);
