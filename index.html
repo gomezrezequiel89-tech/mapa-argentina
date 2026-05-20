@@ -1484,9 +1484,9 @@ function toggleLeftPanel() {
   if (leftPanelVisible) {
     sidebar.classList.remove('collapsed');
     btn.innerHTML = '&#9664;';
-    btn.style.position = 'absolute';
-    btn.style.right = '-22px';
+    btn.style.position = '';
     btn.style.left = '';
+    btn.style.right = '';
     btn.style.top = '';
     btn.style.transform = '';
   } else {
@@ -1494,7 +1494,7 @@ function toggleLeftPanel() {
     btn.innerHTML = '&#9654;';
     btn.style.position = 'fixed';
     btn.style.left = '0px';
-    btn.style.right = '';
+    btn.style.right = 'auto';
     btn.style.top = '50%';
     btn.style.transform = 'translateY(-50%)';
   }
@@ -1509,8 +1509,8 @@ function toggleRightPanel() {
   if (rightPanelVisible) {
     panel.classList.remove('collapsed');
     btn.innerHTML = '&#9654;';
-    btn.style.position = 'absolute';
-    btn.style.left = '-22px';
+    btn.style.position = '';
+    btn.style.left = '';
     btn.style.right = '';
     btn.style.top = '';
     btn.style.transform = '';
@@ -1520,13 +1520,14 @@ function toggleRightPanel() {
     btn.innerHTML = '&#9664;';
     btn.style.position = 'fixed';
     btn.style.right = '0px';
-    btn.style.left = '';
+    btn.style.left = 'auto';
     btn.style.top = '50%';
     btn.style.transform = 'translateY(-50%)';
     if (fab) fab.style.right = '10px';
   }
   if (map) setTimeout(() => map.invalidateSize(), 310);
 }
+
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
