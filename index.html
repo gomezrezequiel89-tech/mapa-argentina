@@ -9,7 +9,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>h
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }h
 body { font-family: Arial, sans-serif; background: #f0f2f5; }
 header { background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); color: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.3); height: 56px; flex-shrink: 0; }
 header h1 { font-size: 1.1em; font-weight: 600; }
@@ -591,6 +591,7 @@ header h1 { font-size: 1.1em; font-weight: 600; }
 <option value="10-12">Trimestre 4 (Oct-Dic)</option>
 <option value="1-12">Año completo</option>
 </select>
+<button onclick="exportRankingExcel()" style="padding:5px 12px;background:linear-gradient(135deg,#28a745 0%,#20c997 100%);color:white;border:none;border-radius:7px;cursor:pointer;font-size:0.82em;white-space:nowrap;">&#128229; Exportar Excel</button>
 </div>
 <table class="facturacion-table">
 <thead><tr><th>#</th><th>Distribuidor</th><th>Ventas</th><th>% Total</th></tr></thead>
@@ -1303,6 +1304,35 @@ const medal = i===0?'&#129351;':i===1?'&#129352;':i===2?'&#129353;':(i+1)+'.';
 return '<tr><td>'+medal+'</td><td><strong>'+d.nombre+'</strong></td><td class="fact-amount">'+fmtMoneyFull(d.monto)+'</td><td><div style="display:flex;align-items:center;gap:6px"><div style="background:#e8f5e9;border-radius:4px;overflow:hidden;width:60px;height:8px"><div style="background:#28a745;width:'+pct+'%;height:100%"></div></div><span style="font-size:0.75em;color:#888">'+pct+'%</span></div></td></tr>';
 }).join('');
 }
+function exportRankingExcel() {
+  const anio = parseInt(document.getElementById('rank-anio')?.value || 2025);
+  const periodo = document.getElementById('rank-periodo')?.value || '1-3';
+  const parts = periodo.split('-');
+  const desde = parseInt(parts[0]), hasta = parseInt(parts[1]);
+  const distribuidores = allClientes.filter(c => c.tipo === 'Distribuidor');
+  const ranking = distribuidores.map(d => ({
+    nombre: d.nombre,
+    monto: getFacturadoForCliente(d.id, anio, desde, hasta)
+  })).filter(d => d.monto > 0).sort((a,b) => b.monto - a.monto);
+  if (ranking.length === 0) { alert('No hay datos para exportar en este perodo'); return; }
+  const total = ranking.reduce((s,d) => s + d.monto, 0);
+  const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const periodoLabel = desde === 1 && hasta === 12 ? 'Anio completo' : 'Meses ' + MESES[desde] + '-' + MESES[hasta];
+  const headers = ['#', 'Distribuidor', 'Ventas (USD)', '% Total'];
+  const rows = ranking.map((d, i) => [
+    i + 1,
+    d.nombre,
+    d.monto,
+    total > 0 ? parseFloat(((d.monto / total) * 100).toFixed(1)) : 0
+  ]);
+  const wb = XLSX.utils.book_new();
+  const wsData = [headers, ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [{wch:5},{wch:40},{wch:20},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Ranking ' + anio);
+  XLSX.writeFile(wb, 'Ranking_Ventas_' + anio + '_' + periodoLabel.replace(/ /g,'_') + '.xlsx');
+}
+
 
 function handleFileImport(event) {
   const file = event.target.files[0];
